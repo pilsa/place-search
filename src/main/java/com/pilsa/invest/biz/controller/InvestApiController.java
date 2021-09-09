@@ -1,5 +1,8 @@
 package com.pilsa.invest.biz.controller;
 
+import com.pilsa.invest.biz.client.service.KaKaoClientService;
+import com.pilsa.invest.biz.client.vo.request.KakaoRequest;
+import com.pilsa.invest.biz.client.vo.response.KakaoResponse;
 import com.pilsa.invest.biz.service.InvestProductService;
 import com.pilsa.invest.biz.service.ProductValidityService;
 import com.pilsa.invest.biz.vo.request.InvestListRequest;
@@ -8,14 +11,12 @@ import com.pilsa.invest.biz.vo.request.InvestTranRequest;
 import com.pilsa.invest.biz.vo.response.InvestListResponse;
 import com.pilsa.invest.biz.vo.response.InvestResponse;
 import com.pilsa.invest.biz.vo.response.InvestTranResponse;
+import com.pilsa.invest.common.code.VersionInfoCode;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 
 /**
@@ -29,6 +30,7 @@ public class InvestApiController {
 
     private final InvestProductService investProductService;
     private final ProductValidityService productValidityService;
+    private final KaKaoClientService kaKaoClientService;
 
 
     /**
@@ -40,9 +42,21 @@ public class InvestApiController {
     @Autowired
     public InvestApiController(
             InvestProductService investProductService
-            , ProductValidityService productValidityService) {
+            , ProductValidityService productValidityService
+            , KaKaoClientService kaKaoClientService) {
         this.investProductService = investProductService;
         this.productValidityService = productValidityService;
+        this.kaKaoClientService = kaKaoClientService;
+    }
+
+    @GetMapping("test")
+    public void localSearchKeyword(){
+        KakaoResponse res =
+        kaKaoClientService.searchLocal(KakaoRequest.builder()
+                .version(VersionInfoCode.V2)
+                .query("카카오프렌즈")
+                .build());
+        System.out.println("TTTTT");
     }
 
     /**

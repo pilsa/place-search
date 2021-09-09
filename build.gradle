@@ -52,7 +52,7 @@ dependencies {
 
 
     /* netty */
-    //implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
 
     /* cache */
     implementation "org.ehcache:ehcache:${ehcacheVersion}"
