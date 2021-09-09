@@ -20,7 +20,7 @@ public class InvestAllianceServiceImpl implements InvestAllianceService {
 
 
     /**
-     * Instantiates a new Invest alliance service.
+     * Instantiates a new Invest alliance service..
      *
      * @param investAllianceMapper the invest alliance mapper
      */
