@@ -15,9 +15,9 @@
     </settings>
 
     <typeAliases>
-        <package name="com.pilsa.invest.biz.service.dto.InvestProductDTO"/>
+        <package name="com.pilsa.place.biz.service.dto.InvestProductDTO"/>
     </typeAliases>
     <typeHandlers>
-        <typeHandler handler="com.pilsa.invest.framework.persistent.handelr.EnumCodeTypeHandler" />
+        <typeHandler handler="com.pilsa.place.framework.persistent.handelr.EnumCodeTypeHandler" />
     </typeHandlers>
 </configuration>

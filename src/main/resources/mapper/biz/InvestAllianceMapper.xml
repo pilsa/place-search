@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.pilsa.invest.biz.service.mapper.InvestAllianceMapper">
+<mapper namespace="com.pilsa.place.biz.service.mapper.InvestAllianceMapper">
 
     <select id="selectInvestAlliance" resultType="InvestAllianceDTO">
         SELECT /** selectInvestAlliance | 활성화 투자연계금융기관 정보 조회 */
