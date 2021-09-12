@@ -50,8 +50,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation "org.mybatis.spring.boot:mybatis-spring-boot-starter:${mybatisVersion}"
 
-
-    /* netty */
+    /* WebClient */
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
 
     /* cache */
@@ -65,7 +64,8 @@ dependencies {
     implementation 'com.h2database:h2'
 
     /* util */
-    implementation 'org.apache.commons:commons-lang3:3.4'
+    //implementation 'org.apache.commons:commons-lang3:3.4'
+    implementation 'org.apache.commons:commons-lang3:3.12.0'
 
     /* lombok */
     compileOnly 'org.projectlombok:lombok'

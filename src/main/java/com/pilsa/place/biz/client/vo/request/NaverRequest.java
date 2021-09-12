@@ -17,7 +17,7 @@ import lombok.experimental.SuperBuilder;
  */
 @Getter
 @SuperBuilder
-public class KakaoRequest extends RequestBase {
+public class NaverRequest extends RequestBase {
 
 /*
     @RequestParam(name="search_timestamp")
@@ -31,17 +31,22 @@ public class KakaoRequest extends RequestBase {
     @RequestParam(name="query")
     private String query; // 검색을 원하는 질의어
 
-    @JsonIgnore
     @Builder.Default
-    @RequestParam(name="size")
-    private int size = 5; // 한 페이지에 보여질 문서의 개수 1~15 사이의 값 (기본값: 15)
+    @JsonIgnore
+    @RequestParam(name="display")
+    private int display = 5; // 1(기본값), 5(최대) 검색 결과 출력 건수 지정
 
     @JsonIgnore
     @Builder.Default
-    @RequestHeader(name = "Authorization")
-    private String Authorization = "KakaoAK 1bff160ca1074e50c07585b91e47806b";
+    @RequestHeader(name = "X-Naver-Client-Id")
+    private String ClientId = "bQA_gDDbrN0lWFXuhWeE";
 
-    public KakaoRequest(VersionInfoCode versionInfoCode, String baseUrl, String uri){
+    @JsonIgnore
+    @Builder.Default
+    @RequestHeader(name = "X-Naver-Client-Secret")
+    private String ClientSecret = "BES5HWgEZp";
+
+    public NaverRequest(VersionInfoCode versionInfoCode, String baseUrl, String uri){
         super(versionInfoCode,baseUrl,uri);
     }
 

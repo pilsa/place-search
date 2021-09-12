@@ -1,9 +1,9 @@
 package com.pilsa.place.biz.controller;
 
-import com.pilsa.place.biz.client.service.KaKaoClientService;
-import com.pilsa.place.biz.client.vo.request.KakaoRequest;
 import com.pilsa.place.biz.client.vo.response.KakaoResponse;
+import com.pilsa.place.biz.client.vo.response.MergeResponse;
 import com.pilsa.place.biz.service.InvestProductService;
+import com.pilsa.place.biz.service.PlaceService;
 import com.pilsa.place.biz.service.ProductValidityService;
 import com.pilsa.place.biz.vo.request.InvestListRequest;
 import com.pilsa.place.biz.vo.request.InvestRequest;
@@ -12,12 +12,13 @@ import com.pilsa.place.biz.vo.request.PlaceRequest;
 import com.pilsa.place.biz.vo.response.InvestListResponse;
 import com.pilsa.place.biz.vo.response.InvestResponse;
 import com.pilsa.place.biz.vo.response.InvestTranResponse;
-import com.pilsa.place.common.code.VersionInfoCode;
+import com.pilsa.place.biz.vo.response.PlaceResponse;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 
 /**
@@ -31,33 +32,55 @@ public class PlaceApiController {
     private final InvestProductService investProductService;
     private final ProductValidityService productValidityService;
 
-    private final KaKaoClientService kaKaoClientService;
-
-
+    private final PlaceService placeService;
 
     @Autowired
     public PlaceApiController(
             InvestProductService investProductService
             , ProductValidityService productValidityService
-            , KaKaoClientService kaKaoClientService) {
+            , PlaceService placeService) {
+        this.placeService = placeService;
         this.investProductService = investProductService;
         this.productValidityService = productValidityService;
-        this.kaKaoClientService = kaKaoClientService;
     }
 
-    @GetMapping("/")
+    @GetMapping("/mono")
     @ApiOperation(
             value = "장소 검색 API", tags = "place",
             notes = "카카오와 네이버의 리소스를 활용 하여 어쩌구")
-    public KakaoResponse localSearchKeyword(PlaceRequest request){
+    public Mono<KakaoResponse> localSearchKeywordMono(PlaceRequest request){
+        // KakaoResponse res = placeService.searchPlace(request);
+        Mono<KakaoResponse> res = placeService.searchPlaceMono(request);
+        /*
         KakaoResponse res =
         kaKaoClientService.searchLocal(KakaoRequest.builder()
                 .version(VersionInfoCode.V2)
                 .query(request.getQuery())
-                .build());
-
+                .build());*/
         return res;
     }
+
+    @GetMapping("")
+    @ApiOperation(
+            value = "장소 검색 API", tags = "place",
+            notes = "카카오와 네이버의 리소스를 활용 하여 어쩌구")
+    public PlaceResponse localSearchKeyword(PlaceRequest request){
+        // KakaoResponse res = placeService.searchPlace(request);
+        //PlaceResponse res = placeService.searchPlaceMerge(request);
+        PlaceResponse res = placeService.searchPlaceMergeSimpleData(request);
+        /*
+        KakaoResponse res =
+        kaKaoClientService.searchLocal(KakaoRequest.builder()
+                .version(VersionInfoCode.V2)
+                .query(request.getQuery())
+                .build());*/
+        return res;
+    }
+
+
+
+
+
 
     /**
      * Gets place product list.

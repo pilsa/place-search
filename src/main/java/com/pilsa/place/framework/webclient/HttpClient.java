@@ -63,20 +63,58 @@ public class HttpClient implements CommonClient{
     }
 
     /**
-     * 프록시 설정
+     * sslContext 설정
      * @throws SSLException
      */
     @PostConstruct
-    public void initProxy() throws SSLException {
-
+    public void init() throws SSLException {
         SslContext sslContext = SslContextBuilder.forClient().trustManager(InsecureTrustManagerFactory.INSTANCE).build();
         reactor.netty.http.client.HttpClient httpClient = reactor.netty.http.client.HttpClient
                 .create()
                 //.wiretap(true)
-                .secure(sslContextSpec -> sslContextSpec.sslContext(sslContext))
-                ;
-
+                .secure(sslContextSpec -> sslContextSpec.sslContext(sslContext));
         reactorClientHttpConnector = new ReactorClientHttpConnector(httpClient);
+    }
+
+    /**
+     * 데이터 요청(GET)
+     * @param <T>
+     * @param requestBase
+     * @param cls
+     * @return
+     */
+    public <T extends ResponseBase> Mono<T> requestDataByGetMono(RequestBase requestBase, Class<T> cls){
+        String transactionId = MDC.get(ApiConstant.TRANSACTION_ID);
+        long requestTime = System.currentTimeMillis();
+        return WebClient.builder()
+                .clientConnector(reactorClientHttpConnector)
+                //.baseUrl("https://dapi.kakao.com")
+                .baseUrl(requestBase.getBaseUrl())
+                .build()
+                .get()
+                .uri(uriBuild -> uriBuild.path(replaceUri(requestBase)).queryParams(getValueMap(requestBase)).build())
+
+                .headers(httpHeaders -> {
+                    //httpHeaders.setBearerAuth(getAccessToken(requestBase));
+                    //httpHeaders.set("Authorization", "KakaoAK 1bff160ca1074e50c07585b91e47806b");
+                    setHeaders(requestBase, httpHeaders);
+                })
+                .exchange()
+                .onErrorResume(e-> {
+                    log.error("[" + transactionId + "] " + e.toString(), e);
+                    //loggingApiRequest(transactionId, transactionId, requestTime, HttpStatus.SERVICE_UNAVAILABLE.value(), requestBase);
+                    return Mono.error(new ExternalException(ExternalExceptionCode.ERROR));
+                })
+                .flatMap(clientResponse -> clientResponse.bodyToMono(cls).map(t -> {
+                    logApis(transactionId, requestBase, t);
+                    //loggingApiRequest(transactionId, transactionId, requestTime, clientResponse.statusCode().value(), requestBase);
+                    /*
+                    if(!ExternalExceptionCode.SUCCESS.getResponseCode().equals(t.getResponseCode())) {
+                        throw new ExternalException(t.getResponseCode(), t.getResponseMessage(), ExternalExceptionCode.findByResponseCode(t.getResponseCode()));
+                    }*/
+
+                    return t;
+                }));
     }
 
     /**
@@ -113,7 +151,8 @@ public class HttpClient implements CommonClient{
                     logApis(transactionId, requestBase, t);
                     //loggingApiRequest(transactionId, transactionId, requestTime, clientResponse.statusCode().value(), requestBase);
 
-/*                    if(!ExternalExceptionCode.SUCCESS.getResponseCode().equals(t.getResponseCode())) {
+                    /*
+                    if(!ExternalExceptionCode.SUCCESS.getResponseCode().equals(t.getResponseCode())) {
                         throw new ExternalException(t.getResponseCode(), t.getResponseMessage(), ExternalExceptionCode.findByResponseCode(t.getResponseCode()));
                     }*/
 
@@ -122,6 +161,7 @@ public class HttpClient implements CommonClient{
                 .block();
     }
 
+
     /**
      * 데이터 요청(GET)
      * @param requestBase
@@ -129,7 +169,7 @@ public class HttpClient implements CommonClient{
      * @param <T>
      * @return
      */
-    public <T extends ResponseBase> T requestDataByGet2(RequestBase requestBase, Class<T> cls){
+    public <T extends ResponseBase> T requestDataByGet3(RequestBase requestBase, Class<T> cls){
         String transactionId = MDC.get(ApiConstant.TRANSACTION_ID);
         long requestTime = System.currentTimeMillis();
 
@@ -172,7 +212,8 @@ public class HttpClient implements CommonClient{
     private String replaceUri(RequestBase requestBase){
 
         //String uri = apiCodeService.getValueByKey(requestBase.getApiCode());
-        String uri = "local/search/keyword.json";
+        //String uri = "local/search/keyword.json";
+        String uri = requestBase.getUri();
 
         for(Field field : getAllFields(requestBase)){
 

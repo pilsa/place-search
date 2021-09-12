@@ -30,4 +30,10 @@ public class RequestBase {
     @Builder.Default
     @JsonIgnore
     private VersionInfoCode version = VersionInfoCode.NONE;
+
+    @JsonIgnore
+    private String baseUrl;
+
+    @JsonIgnore
+    private String uri;
 }
