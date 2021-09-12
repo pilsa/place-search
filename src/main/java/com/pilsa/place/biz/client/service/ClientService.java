@@ -84,26 +84,29 @@ public class ClientService {
                 .display(5)
                 .build()).subscribeOn(Schedulers.elastic());
 
-        MergeSimpleResponse mergeSimpleResponse = Mono.zip(kakaoMono, naverMono, (kakao, naver) ->
-            MergeSimpleResponse.builder()
-                    .kakaoResponse(kakao.getDocuments().stream().map( document ->
-                            MergeSimpleResponse.MergePlace.builder()
-                                    .placeName(document.getPlaceName())
-                                    .addressName(document.getAddressName())
-                                    .roadAddressName(document.getRoadAddressName())
-                                    .placeUrl(document.getPlaceUrl())
-                                    .build())
-                            .collect(Collectors.toList()))
-                    .naverResponse(naver.getItems().stream().map( item ->
-                            MergeSimpleResponse.MergePlace.builder()
-                                    .placeName(item.getTitle())
-                                    .addressName(item.getAddress())
-                                    .roadAddressName(item.getRoadAddress())
-                                    .placeUrl(item.getLink())
-                                    .build())
-                            .collect(Collectors.toList()))
-                    .build()
-        ).block();
-        return mergeSimpleResponse;
+        MergeSimpleResponse response = Mono.zip(kakaoMono, naverMono, (kakao, naver) ->
+                MergeSimpleResponse.builder()
+
+                        .kakaoResponse(kakao.getDocuments().stream().map( document ->
+                                MergeSimpleResponse.MergePlace.builder()
+                                        .placeName(document.getPlaceName())
+                                        .addressName(document.getAddressName())
+                                        .roadAddressName(document.getRoadAddressName())
+                                        .placeUrl(document.getPlaceUrl())
+                                        .build())
+                                .collect(Collectors.toList()))
+
+                        .naverResponse(naver.getItems().stream().map( item ->
+                                MergeSimpleResponse.MergePlace.builder()
+                                        .placeName(item.getTitle())
+                                        .addressName(item.getAddress())
+                                        .roadAddressName(item.getRoadAddress())
+                                        .placeUrl(item.getLink())
+                                        .build())
+                                .collect(Collectors.toList()))
+
+                        .build())
+                .block();
+        return response;
     }
 }
