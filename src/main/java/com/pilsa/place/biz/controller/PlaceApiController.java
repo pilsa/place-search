@@ -1,7 +1,6 @@
 package com.pilsa.place.biz.controller;
 
 import com.pilsa.place.biz.client.vo.response.KakaoResponse;
-import com.pilsa.place.biz.client.vo.response.MergeResponse;
 import com.pilsa.place.biz.service.InvestProductService;
 import com.pilsa.place.biz.service.PlaceService;
 import com.pilsa.place.biz.service.ProductValidityService;
@@ -9,10 +8,7 @@ import com.pilsa.place.biz.vo.request.InvestListRequest;
 import com.pilsa.place.biz.vo.request.InvestRequest;
 import com.pilsa.place.biz.vo.request.InvestTranRequest;
 import com.pilsa.place.biz.vo.request.PlaceRequest;
-import com.pilsa.place.biz.vo.response.InvestListResponse;
-import com.pilsa.place.biz.vo.response.InvestResponse;
-import com.pilsa.place.biz.vo.response.InvestTranResponse;
-import com.pilsa.place.biz.vo.response.PlaceResponse;
+import com.pilsa.place.biz.vo.response.*;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
@@ -74,6 +70,17 @@ public class PlaceApiController {
                 .version(VersionInfoCode.V2)
                 .query(request.getQuery())
                 .build());*/
+        return res;
+    }
+
+    @GetMapping("/Keywords")
+    @ApiOperation(
+            value = "인기 키워드 API", tags = "place",
+            notes = "카카오와 네이버의 리소스를 활용 하여 어쩌구")
+    public KeywordResponse localSearchKeyword(){
+
+        KeywordResponse res = placeService.getPopularKeywordsFromCache();
+
         return res;
     }
 

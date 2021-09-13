@@ -36,7 +36,8 @@ values ('PPF', '피플펀드', 'Y', 30000000, 5000000, 10000000, 5000000,'Y', NO
 select *
 from INVEST_ALLIANCE_TM;
 
-장소검색관리
-place_search_tm
-query
+
+
+
+
 search_count

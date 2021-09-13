@@ -1,5 +1,6 @@
 package com.pilsa.place.framework.ehcache;
 
+import com.pilsa.place.biz.vo.response.KeywordResponse;
 import org.ehcache.config.builders.CacheConfigurationBuilder;
 import org.ehcache.config.builders.ExpiryPolicyBuilder;
 import org.ehcache.config.builders.ResourcePoolsBuilder;
@@ -33,20 +34,20 @@ public class EhcacheConfig {
         CachingProvider provider = Caching.getCachingProvider();
         CacheManager cacheManager = provider.getCacheManager();
 
-        cacheManager.createCache("allianceCache", allianceCache());
+        cacheManager.createCache("popularKeywordCache", popularKeywordCache());
         cacheManager.createCache("apiCache", apiCache());
 
         return cacheManager;
 
     }
 
-    private javax.cache.configuration.Configuration<String, List> allianceCache() {
+    private javax.cache.configuration.Configuration<String, KeywordResponse> popularKeywordCache() {
 
-        CacheConfigurationBuilder<String, List> configuration = CacheConfigurationBuilder.newCacheConfigurationBuilder(
+        CacheConfigurationBuilder<String, KeywordResponse> configuration = CacheConfigurationBuilder.newCacheConfigurationBuilder(
                 String.class,
-                List.class,
+                KeywordResponse.class,
                 ResourcePoolsBuilder.newResourcePoolsBuilder().offheap(1, MemoryUnit.MB))
-                .withExpiry(ExpiryPolicyBuilder.timeToIdleExpiration(Duration.ofDays(1)));
+                .withExpiry(ExpiryPolicyBuilder.timeToLiveExpiration(Duration.ofSeconds(10)));
 
         return Eh107Configuration.fromEhcacheCacheConfiguration(configuration);
 

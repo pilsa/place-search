@@ -6,11 +6,14 @@ import com.pilsa.place.biz.client.vo.response.KakaoResponse;
 import com.pilsa.place.biz.client.vo.response.MergeResponse;
 import com.pilsa.place.biz.client.vo.response.MergeSimpleResponse;
 import com.pilsa.place.biz.client.vo.response.NaverResponse;
+import com.pilsa.place.biz.service.mapper.PlaceSearchMapper;
 import com.pilsa.place.biz.vo.request.PlaceRequest;
+import com.pilsa.place.biz.vo.response.KeywordResponse;
 import com.pilsa.place.biz.vo.response.PlaceResponse;
 import com.pilsa.place.common.code.VersionInfoCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import reactor.core.publisher.Mono;
@@ -34,9 +37,11 @@ public class PlaceServiceImpl implements PlaceService {
     private String profileActive;
 
     private final ClientService clientService;
+    private final PlaceSearchMapper placeSearchMapper;
 
-    public PlaceServiceImpl(ClientService clientService) {
+    public PlaceServiceImpl(ClientService clientService, PlaceSearchMapper placeSearchMapper) {
         this.clientService = clientService;
+        this.placeSearchMapper = placeSearchMapper;
     }
 
     @Override
@@ -144,6 +149,24 @@ public class PlaceServiceImpl implements PlaceService {
                         .totalCount(mergePlaces.size())
                         .build())
                 .places(mergePlaces)
+                .build();
+    }
+
+
+
+    @Override
+    @Cacheable(cacheNames = "popularKeywordCache", key="'fewHour'")
+    public KeywordResponse getPopularKeywordsFromCache() {
+        List<KeywordResponse.Keyword> keywordList = placeSearchMapper.selectPopularKeywords().stream()
+                .map(transactionDTO -> KeywordResponse.Keyword.builder()
+                        .query(transactionDTO.getQuery())
+                        .queryCnt(transactionDTO.getQueryCnt())
+                        .build())
+                .collect(Collectors.toList());
+
+        return KeywordResponse.builder()
+                .meta(KeywordResponse.Meta.builder().totalCount(keywordList.size()).build())
+                .keywords(keywordList)
                 .build();
     }
 
