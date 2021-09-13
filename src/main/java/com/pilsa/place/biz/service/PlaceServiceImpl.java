@@ -6,12 +6,17 @@ import com.pilsa.place.biz.client.vo.response.KakaoResponse;
 import com.pilsa.place.biz.client.vo.response.MergeResponse;
 import com.pilsa.place.biz.client.vo.response.MergeSimpleResponse;
 import com.pilsa.place.biz.client.vo.response.NaverResponse;
+import com.pilsa.place.biz.service.dto.PlaceTransactionDTO;
 import com.pilsa.place.biz.service.mapper.PlaceSearchMapper;
 import com.pilsa.place.biz.vo.request.PlaceRequest;
 import com.pilsa.place.biz.vo.response.KeywordResponse;
 import com.pilsa.place.biz.vo.response.PlaceResponse;
+import com.pilsa.place.common.code.ResponseCode;
 import com.pilsa.place.common.code.VersionInfoCode;
+import com.pilsa.place.common.constant.ApiConstant;
+import com.pilsa.place.framework.exception.ServiceException;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -24,9 +29,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * The type Invest product service.
- *
+ * 
  * @author pilsa_home1
+ * @since 2021-09-14 오전 2:29
  */
 @Validated
 @Slf4j
@@ -37,12 +42,15 @@ public class PlaceServiceImpl implements PlaceService {
     private String profileActive;
 
     private final ClientService clientService;
+    private final keywordService keywordService;
     private final PlaceSearchMapper placeSearchMapper;
 
-    public PlaceServiceImpl(ClientService clientService, PlaceSearchMapper placeSearchMapper) {
+    public PlaceServiceImpl(ClientService clientService, com.pilsa.place.biz.service.keywordService keywordService, PlaceSearchMapper placeSearchMapper) {
         this.clientService = clientService;
+        this.keywordService = keywordService;
         this.placeSearchMapper = placeSearchMapper;
     }
+
 
     @Override
     public Mono<KakaoResponse> searchPlaceMono(PlaceRequest request) {
@@ -114,6 +122,15 @@ public class PlaceServiceImpl implements PlaceService {
                         .placeUrl(item.getLink())
                         .build()));
 
+        /*======================================================================================
+         * i)
+        ======================================================================================*/
+        placeSearchMapper.insertSearchHistory(PlaceTransactionDTO.builder()
+                .query(request.getQuery())
+                .build());
+        log.debug("@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Async Start "+ MDC.get(ApiConstant.TRANSACTION_ID));
+        if (mergePlaces.size() > 0 ) keywordService.saveSearchHistory(request);
+
         return PlaceResponse.builder()
                 .meta(PlaceResponse.Meta.builder().totalCount(mergePlaces.size()).build())
                 .places(mergePlaces)
@@ -169,6 +186,5 @@ public class PlaceServiceImpl implements PlaceService {
                 .keywords(keywordList)
                 .build();
     }
-
 
 }

@@ -4,16 +4,16 @@ import com.pilsa.place.biz.client.vo.response.KakaoResponse;
 import com.pilsa.place.biz.service.InvestProductService;
 import com.pilsa.place.biz.service.PlaceService;
 import com.pilsa.place.biz.service.ProductValidityService;
-import com.pilsa.place.biz.vo.request.InvestListRequest;
-import com.pilsa.place.biz.vo.request.InvestRequest;
-import com.pilsa.place.biz.vo.request.InvestTranRequest;
 import com.pilsa.place.biz.vo.request.PlaceRequest;
-import com.pilsa.place.biz.vo.response.*;
+import com.pilsa.place.biz.vo.response.KeywordResponse;
+import com.pilsa.place.biz.vo.response.PlaceResponse;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
 
@@ -40,99 +40,37 @@ public class PlaceApiController {
         this.productValidityService = productValidityService;
     }
 
-    @GetMapping("/mono")
+    @GetMapping("")
+    @ApiOperation(
+            value = "장소 검색 API", tags = "place",
+            notes = "<b>카카오와 네이버의 검색 API에서 최대 10개를 추출합니다.</b>" +
+                    "<li>카카오 결과 네이버 결과 모두 존재 : 최상위에 정렬</li>" +
+                    "<li>둘 중 하나에만 존재하는 경우, 카카오 결과를 우선 정렬 후 네이버 결과 정렬</li>")
+    public PlaceResponse getPlaces(PlaceRequest request){
+        //PlaceResponse res = placeService.searchPlace(request);
+        //PlaceResponse res = placeService.searchPlaceMerge(request);
+        PlaceResponse res = placeService.searchPlaceMerge(request);
+        return res;
+    }
+
+
+    @GetMapping("/keywords")
+    @ApiOperation(
+            value = "인기 키워드 API", tags = "place",
+            notes = "카카오와 네이버의 리소스를 활용 하여 어쩌구")
+    public KeywordResponse getPopularKeywords(){
+        KeywordResponse res = placeService.getPopularKeywordsFromCache();
+        return res;
+    }
+
+    // TODO : 테스트용도
+    @GetMapping("/kakao-mono")
     @ApiOperation(
             value = "장소 검색 API", tags = "place",
             notes = "카카오와 네이버의 리소스를 활용 하여 어쩌구")
     public Mono<KakaoResponse> localSearchKeywordMono(PlaceRequest request){
-        // KakaoResponse res = placeService.searchPlace(request);
         Mono<KakaoResponse> res = placeService.searchPlaceMono(request);
-        /*
-        KakaoResponse res =
-        kaKaoClientService.searchLocal(KakaoRequest.builder()
-                .version(VersionInfoCode.V2)
-                .query(request.getQuery())
-                .build());*/
         return res;
     }
-
-    @GetMapping("")
-    @ApiOperation(
-            value = "장소 검색 API", tags = "place",
-            notes = "카카오와 네이버의 리소스를 활용 하여 어쩌구")
-    public PlaceResponse localSearchKeyword(PlaceRequest request){
-        // KakaoResponse res = placeService.searchPlace(request);
-        //PlaceResponse res = placeService.searchPlaceMerge(request);
-        PlaceResponse res = placeService.searchPlaceMergeSimpleData(request);
-        /*
-        KakaoResponse res =
-        kaKaoClientService.searchLocal(KakaoRequest.builder()
-                .version(VersionInfoCode.V2)
-                .query(request.getQuery())
-                .build());*/
-        return res;
-    }
-
-    @GetMapping("/Keywords")
-    @ApiOperation(
-            value = "인기 키워드 API", tags = "place",
-            notes = "카카오와 네이버의 리소스를 활용 하여 어쩌구")
-    public KeywordResponse localSearchKeyword(){
-
-        KeywordResponse res = placeService.getPopularKeywordsFromCache();
-
-        return res;
-    }
-
-
-
-
-
-
-    /**
-     * Gets place product list.
-     *
-     * @param request the request
-     * @return the place product list
-     */
-    @PostMapping("/products")
-    @ApiOperation(
-            value = "전체 투자 상품 조회 API", tags = "place",
-            notes = "<b>※ sortOption 정렬순서 파라미터 설명</b>" +
-                    "<li>INCOME : 높은 수익률 순서</li>" +
-                    "<li>PERIOD : 짧은 기간 순서</li>" +
-                    "<li>CLOSING : 마감 임박 순서</li>")
-    public InvestListResponse getInvestProductList(@RequestBody InvestListRequest request) {
-        return investProductService.getInvestProducts(request);
-    }
-
-    /**
-     * Invest in products place response.
-     *
-     * @param request the request
-     * @return the place response
-     */
-    @PostMapping("")
-    @ApiOperation(
-            value = "투자하기 API", tags = "place",
-            notes = "사용자 식별값, 상품ID, 투자금액을 투입하여 투자를 수행 합니다.")
-    public InvestResponse investInProducts(@RequestBody InvestRequest request) {
-        return investProductService.investInProducts(request);
-    }
-
-    /**
-     * Gets my place transactions.
-     *
-     * @param request the request
-     * @return the my place transactions
-     */
-    @PostMapping("/transactions")
-    @ApiOperation(
-            value = "나의 투자상품 조회 API", tags = "place",
-            notes = "사용자가 투자한 모든 상품을 반환합니다.")
-    public InvestTranResponse getMyInvestTransactions(@RequestBody InvestTranRequest request) {
-        return investProductService.getMyInvestTransactions(request);
-    }
-
 
 }

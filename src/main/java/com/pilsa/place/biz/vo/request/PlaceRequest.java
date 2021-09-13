@@ -9,9 +9,9 @@ import org.hibernate.validator.constraints.Length;
 import javax.validation.constraints.NotBlank;
 
 /**
- * The type Invest request.
  *
  * @author pilsa_home1
+ * @since 2021-09-14 오전 1:53
  */
 @Data
 @Builder
@@ -25,6 +25,5 @@ public class PlaceRequest extends CommonRequest {
     @Length(min = 1 , max = 100)
     @ApiModelProperty(value="질의어", example = "카카오프렌즈", required = true)
     private String query;
-
 
 }
