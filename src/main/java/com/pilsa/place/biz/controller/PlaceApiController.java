@@ -10,7 +10,6 @@ import com.pilsa.place.biz.vo.response.PlaceResponse;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,10 +26,8 @@ public class PlaceApiController {
 
     private final InvestProductService investProductService;
     private final ProductValidityService productValidityService;
-
     private final PlaceService placeService;
 
-    @Autowired
     public PlaceApiController(
             InvestProductService investProductService
             , ProductValidityService productValidityService
@@ -59,9 +56,9 @@ public class PlaceApiController {
             value = "인기 키워드 API", tags = "place",
             notes = "카카오와 네이버의 리소스를 활용 하여 어쩌구")
     public KeywordResponse getPopularKeywords(){
-        KeywordResponse res = placeService.getPopularKeywordsFromCache();
-        return res;
+        return placeService.getPopularKeywordsFromCache();
     }
+
 
     // TODO : 테스트용도
     @GetMapping("/kakao-mono")

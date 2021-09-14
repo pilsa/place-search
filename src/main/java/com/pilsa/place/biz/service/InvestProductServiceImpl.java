@@ -82,7 +82,7 @@ public class InvestProductServiceImpl implements InvestProductService {
                 investProductMapper.updateProductDetail(ProductDetailDTO.builder()
                         .productId(investProduct.getProductId())
                         .productStatus(ProductStatusCode.RECRUIT_ING)
-                        .lstChngId(String.valueOf(request.getMemberNum()))
+                        //.lstChngId(String.valueOf(request.getMemberNum()))
                         .build());
             }
         }
@@ -119,7 +119,7 @@ public class InvestProductServiceImpl implements InvestProductService {
          * 1) 투자 유효성 검증
         ======================================================================================*/
         InvestResponse response = productValidityService.productValidity(InvestCondition.builder()
-                .memberNum(request.getMemberNum())
+                //.memberNum(request.getMemberNum())
                 .productId(request.getProductId())
                 .investAmount(request.getInvestAmount())
                 .build());
@@ -131,7 +131,7 @@ public class InvestProductServiceImpl implements InvestProductService {
                 .productId(request.getProductId())
                 .currentInvestAmount(request.getInvestAmount())
                 .productStatus(ProductStatusCode.getCodeByString(response.getProductStatusCode()))
-                .lstChngId(String.valueOf(request.getMemberNum()))
+                //.lstChngId(String.valueOf(request.getMemberNum()))
                 .build());
 
         /*======================================================================================
@@ -139,15 +139,15 @@ public class InvestProductServiceImpl implements InvestProductService {
         ======================================================================================*/
         investProductMapper.insertProductHistory(ProductHistoryDTO.builder()
                 .transactionId(request.getTransactionId())
-                .memberNum(request.getMemberNum())
+                //.memberNum(request.getMemberNum())
                 .productId(request.getProductId())
                 .transType(TransactionTypeCode.INVEST)
                 .transAmount(request.getInvestAmount())
                 .transAt(LocalDateTime.now())
                 .frstRgsAt(LocalDateTime.now())
-                .frstRgsId(String.valueOf(request.getMemberNum()))
+                //.frstRgsId(String.valueOf(request.getMemberNum()))
                 .lstChngAt(LocalDateTime.now())
-                .lstChngId(String.valueOf(request.getMemberNum()))
+                //.lstChngId(String.valueOf(request.getMemberNum()))
                 .build());
 
         return response;
@@ -159,7 +159,7 @@ public class InvestProductServiceImpl implements InvestProductService {
          * 나의 투자상품을 조회
         ======================================================================================*/
         List<InvestTransactionDTO> transactionList = investProductMapper.selectMyInvestTransactions(InvestCondition.builder()
-                .memberNum(request.getMemberNum())
+                //.memberNum(request.getMemberNum())
                 .build());
 
         return InvestTranResponse.builder()

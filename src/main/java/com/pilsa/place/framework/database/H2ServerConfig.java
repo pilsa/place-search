@@ -21,13 +21,14 @@ import java.sql.SQLException;
 
 /**
  * The type H2DataBase server config.
+ * 로컬에서만 사용하는 H2DB 설정을 정의한다.
  *
  * @author pilsa_home1
  */
 @Slf4j
 @Configuration
 @Profile("local")
-@MapperScan(basePackages = {"com.pilsa.place.biz.**.mapper"}, sqlSessionFactoryRef = "investSqlSessionFactory")
+@MapperScan(basePackages = {"com.pilsa.place.biz.**.mapper"}, sqlSessionFactoryRef = "placeSqlSessionFactory")
 public class H2ServerConfig {
 
 
@@ -37,7 +38,7 @@ public class H2ServerConfig {
      * @return the data source
      * @throws SQLException the sql exception
      */
-    @Bean(name = "investDataSource")
+    @Bean(name = "placeDataSource")
     @ConfigurationProperties("spring.datasource.hikari")
     public DataSource dataSource() throws SQLException {
 
@@ -50,17 +51,17 @@ public class H2ServerConfig {
     }
 
     /**
-     * Invest sql session factory bean sql session factory.
+     * place sql session factory bean sql session factory.
      *
-     * @param investDataSource   the place data source
+     * @param placeDataSource   the place data source
      * @param applicationContext the application context
      * @return the sql session factory
      * @throws Exception the exception
      */
-    @Bean(name = "investSqlSessionFactory")
-    public SqlSessionFactory investSqlSessionFactoryBean(@Qualifier("investDataSource") DataSource investDataSource, ApplicationContext applicationContext) throws Exception {
+    @Bean(name = "placeSqlSessionFactory")
+    public SqlSessionFactory placeSqlSessionFactoryBean(@Qualifier("placeDataSource") DataSource placeDataSource, ApplicationContext applicationContext) throws Exception {
         SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
-        sqlSessionFactoryBean.setDataSource(investDataSource);
+        sqlSessionFactoryBean.setDataSource(placeDataSource);
         sqlSessionFactoryBean.setConfigLocation(applicationContext.getResource("classpath:mybatis/mybatis-config.xml"));
         sqlSessionFactoryBean.setTypeAliasesPackage(
                 "com.pilsa.place.biz.**.dto"
@@ -72,14 +73,14 @@ public class H2ServerConfig {
     }
 
     /**
-     * Invest sql session template bean sql session template.
+     * place sql session template bean sql session template.
      *
-     * @param investSqlSessionFactory the place sql session factory
+     * @param placeSqlSessionFactory the place sql session factory
      * @return the sql session template
      */
-    @Bean(name = "investSqlSessionTemplate")
-    public SqlSessionTemplate investSqlSessionTemplateBean(@Qualifier("investSqlSessionFactory") SqlSessionFactory investSqlSessionFactory) {
-        return new SqlSessionTemplate(investSqlSessionFactory);
+    @Bean(name = "placeSqlSessionTemplate")
+    public SqlSessionTemplate placeSqlSessionTemplateBean(@Qualifier("placeSqlSessionFactory") SqlSessionFactory placeSqlSessionFactory) {
+        return new SqlSessionTemplate(placeSqlSessionFactory);
     }
 
 }

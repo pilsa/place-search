@@ -1,10 +1,7 @@
 package com.pilsa.place.framework.aspect;
 
-import com.pilsa.place.common.code.ParameterTypeCode;
-import com.pilsa.place.common.code.ResponseCode;
 import com.pilsa.place.common.constant.ApiConstant;
 import com.pilsa.place.common.web.vo.request.CommonRequest;
-import com.pilsa.place.framework.exception.ServiceException;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
@@ -12,7 +9,6 @@ import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -35,7 +31,6 @@ public class ControllerAspect {
         MDC.put(ApiConstant.TRANSACTION_ID, commonRequest.getTransactionId());
     }
 
-    //@RequestHeader(value = ApiConstant.X_USER_ID) String userNum
     @Before("controllerAdvice() && args(commonRequest)")
     public void maintenance(JoinPoint joinPoint, CommonRequest commonRequest){
         /*======================================================================================
@@ -43,12 +38,13 @@ public class ControllerAspect {
         ======================================================================================*/
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
         /*======================================================================================
-         * Header 정보를 모두 가져온다. (공통으로 Header 값 검증이 더 필요의 경우)
+         * Header 정보를 모두 가져온다. (공통으로 Header 값 검증이 필요의 경우 작성한다.)
         ======================================================================================*/
         Map<String,String> headerMap = getHeaderMap(request);
         /*======================================================================================
          * Controller 수행 전 공통로직을 처리한다.
         ======================================================================================*/
+        /*
         String headerUserId = headerMap.get(ApiConstant.X_USER_ID);
         if (StringUtils.isEmpty(headerUserId)){
             throw new ServiceException(ResponseCode.INVALID_HEADER, ApiConstant.X_USER_ID);
@@ -64,11 +60,12 @@ public class ControllerAspect {
         } catch (NumberFormatException e){
             throw new ServiceException(ResponseCode.INVALID_PARAMETER_RANGE,ApiConstant.X_USER_ID,"0~9999999999");
         }
+        */
 
         /*======================================================================================
          * business 에서 사용할 수 있도록 commonRequest 에 Set 한다.
         ======================================================================================*/
-        commonRequest.setMemberNum(Long.parseLong(headerUserId));
+        //commonRequest.setMemberNum(Long.parseLong(headerUserId));
         commonRequest.setTransactionId(MDC.get(ApiConstant.TRANSACTION_ID));
     }
 

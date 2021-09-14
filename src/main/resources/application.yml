@@ -5,3 +5,10 @@
 spring:
   profiles:
     active: local
+
+endpoints:
+  kakao:
+    base-url: https://dapi.kakao.com
+  naver:
+    base-url: https://openapi.naver.com
+

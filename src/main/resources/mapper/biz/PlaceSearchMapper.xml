@@ -20,16 +20,21 @@
 
     <select id="selectPopularKeywords" resultType="PlaceTransactionDTO">
         SELECT /** selectPopularKeywords |  인기 키워드 목록 조회 */
-              QUERY                         /* 질의어 */
-            , COUNT(QUERY) AS QUERY_CNT     /* 조회횟수 */
-        FROM PLACE_SEARCH_TH
-        WHERE 1=1
-        <![CDATA[
-            AND TRANS_AT <= UNIX_TIMESTAMP(NOW())
-            AND TRANS_AT >= UNIX_TIMESTAMP(DATEADD(HOUR,-24,NOW()))
-        ]]>
-        GROUP BY QUERY
-        ORDER BY QUERY_CNT DESC, query ASC
-        LIMIT 10
+              QUERY             /* 질의어 */
+            , ROWNUM() AS RANK  /* 순위 */
+            , QUERY_CNT         /* 조회횟수 */
+        FROM (
+            SELECT
+                  QUERY
+                , COUNT(QUERY) AS QUERY_CNT
+            FROM PLACE_SEARCH_TH
+            WHERE 1=1
+            <![CDATA[
+                AND TRANS_AT <= UNIX_TIMESTAMP(NOW())
+                AND TRANS_AT >= UNIX_TIMESTAMP(DATEADD(HOUR,#{fewHour},NOW()))
+            ]]>
+            GROUP BY QUERY
+            ORDER BY QUERY_CNT DESC, QUERY ASC
+            LIMIT 10)
     </select>
 </mapper>

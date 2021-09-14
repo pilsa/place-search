@@ -34,5 +34,5 @@ spring:
   jackson:
     serialization:
       FAIL_ON_EMPTY_BEANS: false
-    default-property-inclusion: non_default
+    #default-property-inclusion: non_default
 

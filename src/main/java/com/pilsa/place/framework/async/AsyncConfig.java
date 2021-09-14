@@ -23,6 +23,7 @@ public class AsyncConfig extends AsyncConfigurerSupport {
         executor.setMaxPoolSize(30);
         executor.setQueueCapacity(50);
         executor.setThreadNamePrefix("place-async-");
+        executor.setTaskDecorator(new LoggingTaskDecorator());
         executor.initialize();
         return executor;
     }

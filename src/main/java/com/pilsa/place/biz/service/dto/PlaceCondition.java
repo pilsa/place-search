@@ -14,6 +14,6 @@ import lombok.*;
 @Builder
 public class PlaceCondition {
 
-    private int fewHour;        /* 집계범위 */
+    private int fewHour;        /* 집계시간 */
 
 }

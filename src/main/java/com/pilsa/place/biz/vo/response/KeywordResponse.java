@@ -45,6 +45,8 @@ public class KeywordResponse implements Serializable {
 
         @ApiModelProperty(value="질의어")
         private String query;
+        @ApiModelProperty(value="순위")
+        private int rank;
         @ApiModelProperty(value="누적조회횟수")
         private int queryCnt;
     }

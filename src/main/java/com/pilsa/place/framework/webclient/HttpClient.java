@@ -37,16 +37,6 @@ public class HttpClient implements CommonClient{
 
     private ReactorClientHttpConnector reactorClientHttpConnector;
 
-/*
-    @Value("${finnq.my-data.proxy.host}")
-    private String proxyHost;
-
-    @Value("${finnq.my-data.proxy.port}")
-    private int proxyPort;
-
-    @Value("${finnq.my-data.domain-code}")
-    private String domainCode;*/
-
     public HttpClient() {
 
     }

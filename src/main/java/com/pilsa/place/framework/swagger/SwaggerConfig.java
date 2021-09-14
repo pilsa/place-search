@@ -1,6 +1,5 @@
 package com.pilsa.place.framework.swagger;
 
-import com.pilsa.place.common.constant.ApiConstant;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -14,20 +13,13 @@ import springfox.documentation.service.ParameterType;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 
-import java.util.Collections;
 
-/**
- * swagger 설정
- *
- * @author : pilsa_internet
- * @since : 2021-07-12 오후 4:03
- */
 @Profile("!prd")
 @Configuration
 public class SwaggerConfig {
 
     private static final String API_NAME = "장소검색API";
-    private static final String API_VERSION = "0.1";
+    private static final String API_VERSION = "1.0";
     private static final String API_DESCRIPTION = "이진영";
 
     @Bean
@@ -41,6 +33,7 @@ public class SwaggerConfig {
 
 
         return new Docket(DocumentationType.OAS_30)
+                /*
                 .globalRequestParameters(
                         Collections.singletonList(new RequestParameterBuilder()
                                 .name(ApiConstant.X_USER_ID)
@@ -49,6 +42,7 @@ public class SwaggerConfig {
                                 .required(false)
                                 .query(q -> q.model(m -> m.scalarModel(ScalarType.STRING)))
                                 .build()))
+                */
                 .select()
                 .apis(RequestHandlerSelectors.any())
                 .paths(PathSelectors.any())

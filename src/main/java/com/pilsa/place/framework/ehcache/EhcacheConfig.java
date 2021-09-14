@@ -46,7 +46,8 @@ public class EhcacheConfig {
         CacheConfigurationBuilder<String, KeywordResponse> configuration = CacheConfigurationBuilder.newCacheConfigurationBuilder(
                 String.class,
                 KeywordResponse.class,
-                ResourcePoolsBuilder.newResourcePoolsBuilder().offheap(1, MemoryUnit.MB))
+                ResourcePoolsBuilder.newResourcePoolsBuilder()
+                        .offheap(3, MemoryUnit.MB))
                 .withExpiry(ExpiryPolicyBuilder.timeToLiveExpiration(Duration.ofSeconds(10)));
 
         return Eh107Configuration.fromEhcacheCacheConfiguration(configuration);

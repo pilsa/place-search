@@ -19,15 +19,6 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public class NaverRequest extends RequestBase {
 
-/*
-    @RequestParam(name="search_timestamp")
-    private String searchTimestamp; // 조회 타임스탬프
-    @RequestParam(name="next_page", isIncludeZero = false)
-    private String nextPage; // 다음 페이지 기준개체
-    @RequestParam(name="limit")
-    private String limit; // 최대조회갯수
-*/
-
     @RequestParam(name="query")
     private String query; // 검색을 원하는 질의어
 

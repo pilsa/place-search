@@ -1,20 +1,16 @@
 package com.pilsa.place.biz.service;
 
 import com.pilsa.place.biz.client.service.ClientService;
-import com.pilsa.place.biz.client.vo.request.KakaoRequest;
 import com.pilsa.place.biz.client.vo.response.KakaoResponse;
 import com.pilsa.place.biz.client.vo.response.MergeResponse;
 import com.pilsa.place.biz.client.vo.response.MergeSimpleResponse;
 import com.pilsa.place.biz.client.vo.response.NaverResponse;
-import com.pilsa.place.biz.service.dto.PlaceTransactionDTO;
+import com.pilsa.place.biz.service.dto.PlaceCondition;
 import com.pilsa.place.biz.service.mapper.PlaceSearchMapper;
 import com.pilsa.place.biz.vo.request.PlaceRequest;
 import com.pilsa.place.biz.vo.response.KeywordResponse;
 import com.pilsa.place.biz.vo.response.PlaceResponse;
-import com.pilsa.place.common.code.ResponseCode;
-import com.pilsa.place.common.code.VersionInfoCode;
 import com.pilsa.place.common.constant.ApiConstant;
-import com.pilsa.place.framework.exception.ServiceException;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
@@ -54,13 +50,7 @@ public class PlaceServiceImpl implements PlaceService {
 
     @Override
     public Mono<KakaoResponse> searchPlaceMono(PlaceRequest request) {
-        return clientService.callKaKaoSearch(KakaoRequest.builder()
-                .baseUrl("https://dapi.kakao.com")
-                .uri("local/search/keyword.json")
-                .version(VersionInfoCode.V2)
-                .query(request.getQuery())
-                .size(5)
-                .build());
+        return clientService.callKaKaoSearch(request);
     }
 
     @Override
@@ -122,14 +112,12 @@ public class PlaceServiceImpl implements PlaceService {
                         .placeUrl(item.getLink())
                         .build()));
 
+
         /*======================================================================================
-         * i)
+         * i) 비동기 &
         ======================================================================================*/
-        placeSearchMapper.insertSearchHistory(PlaceTransactionDTO.builder()
-                .query(request.getQuery())
-                .build());
         log.debug("@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Async Start "+ MDC.get(ApiConstant.TRANSACTION_ID));
-        if (mergePlaces.size() > 0 ) keywordService.saveSearchHistory(request);
+        if (mergePlaces.size() > 0 ) keywordService.saveSearchHistoryAsync(request);
 
         return PlaceResponse.builder()
                 .meta(PlaceResponse.Meta.builder().totalCount(mergePlaces.size()).build())
@@ -174,12 +162,17 @@ public class PlaceServiceImpl implements PlaceService {
     @Override
     @Cacheable(cacheNames = "popularKeywordCache", key="'fewHour'")
     public KeywordResponse getPopularKeywordsFromCache() {
-        List<KeywordResponse.Keyword> keywordList = placeSearchMapper.selectPopularKeywords().stream()
-                .map(transactionDTO -> KeywordResponse.Keyword.builder()
-                        .query(transactionDTO.getQuery())
-                        .queryCnt(transactionDTO.getQueryCnt())
-                        .build())
-                .collect(Collectors.toList());
+        /*======================================================================================
+         * 1) 인기 키워드 목록 조회
+        ======================================================================================*/
+        List<KeywordResponse.Keyword> keywordList =
+                placeSearchMapper.selectPopularKeywords(PlaceCondition.builder().fewHour(-24).build()).stream()
+                        .map(transactionDTO -> KeywordResponse.Keyword.builder()
+                                .query(transactionDTO.getQuery())
+                                .rank(transactionDTO.getRank())
+                                .queryCnt(transactionDTO.getQueryCnt())
+                                .build())
+                        .collect(Collectors.toList());
 
         return KeywordResponse.builder()
                 .meta(KeywordResponse.Meta.builder().totalCount(keywordList.size()).build())

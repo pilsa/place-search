@@ -1,7 +1,6 @@
 package com.pilsa.place.common.web.vo.request;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,11 +18,6 @@ import lombok.ToString;
 @ToString
 public class CommonRequest {
 
-    @JsonIgnore
-    @ApiParam(value="트렌젝션ID")
+    @ApiModelProperty(hidden = true)
     private String transactionId;
-
-    @JsonIgnore
-    @ApiParam(value="회원번호")
-    private long memberNum;
 }

@@ -30,8 +30,6 @@ public class FilterConfig implements Filter {
                 .concat(SystemProperties.INSTANCE_ID)
                 .concat(new DecimalFormat("00000").format(nextMessageId()));
         MDC.put(ApiConstant.TRANSACTION_ID,transactionId);
-
-        //InvestHttpRequestWrapper wrapper = new InvestHttpRequestWrapper((HttpServletRequest) request);
         chain.doFilter(request,response);
     }
 
@@ -53,7 +51,6 @@ public class FilterConfig implements Filter {
             return sequence;
         }
     }
-
 
     @Override
     public void destroy() {
