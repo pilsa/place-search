@@ -20,13 +20,15 @@ import java.util.List;
  * The type Ehcache config.
  *
  * @author pilsa_home1
+ * @since 2021 -09-12 오전 12:40
  */
 @Configuration
 @EnableCaching
-public class EhcacheConfig {
+public class  EhcacheConfig {
 
     /**
      * Eh cache manager cache manager.
+     *
      * @return the cache manager
      */
     @Bean
@@ -35,7 +37,7 @@ public class EhcacheConfig {
         CacheManager cacheManager = provider.getCacheManager();
 
         cacheManager.createCache("popularKeywordCache", popularKeywordCache());
-        cacheManager.createCache("apiCache", apiCache());
+        cacheManager.createCache("apiMetaCache", apiCache());
 
         return cacheManager;
 
@@ -59,7 +61,8 @@ public class EhcacheConfig {
         CacheConfigurationBuilder<String, List> configuration = CacheConfigurationBuilder.newCacheConfigurationBuilder(
                 String.class,
                 List.class,
-                ResourcePoolsBuilder.newResourcePoolsBuilder().offheap(1, MemoryUnit.MB))
+                ResourcePoolsBuilder.newResourcePoolsBuilder()
+                        .offheap(1, MemoryUnit.MB))
                 .withExpiry(ExpiryPolicyBuilder.timeToIdleExpiration(Duration.ofDays(1)));
 
         return Eh107Configuration.fromEhcacheCacheConfiguration(configuration);

@@ -1,6 +1,7 @@
 package com.pilsa.place.biz.client.vo.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.pilsa.place.common.code.ApiCode;
 import com.pilsa.place.common.code.VersionInfoCode;
 import com.pilsa.place.framework.webclient.annotation.RequestHeader;
 import com.pilsa.place.framework.webclient.annotation.RequestParam;
@@ -37,8 +38,8 @@ public class NaverRequest extends RequestBase {
     @RequestHeader(name = "X-Naver-Client-Secret")
     private String ClientSecret = "BES5HWgEZp";
 
-    public NaverRequest(VersionInfoCode versionInfoCode, String baseUrl, String uri){
-        super(versionInfoCode,baseUrl,uri);
+    public NaverRequest(VersionInfoCode versionInfoCode, String baseUrl, String uri, ApiCode.Code apiCode){
+        super(versionInfoCode,baseUrl,uri,apiCode);
     }
 
 }

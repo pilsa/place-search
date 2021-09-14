@@ -1,9 +1,7 @@
 package com.pilsa.place.biz.controller;
 
 import com.pilsa.place.biz.client.vo.response.KakaoResponse;
-import com.pilsa.place.biz.service.InvestProductService;
 import com.pilsa.place.biz.service.PlaceService;
-import com.pilsa.place.biz.service.ProductValidityService;
 import com.pilsa.place.biz.vo.request.PlaceRequest;
 import com.pilsa.place.biz.vo.response.KeywordResponse;
 import com.pilsa.place.biz.vo.response.PlaceResponse;
@@ -24,17 +22,10 @@ import reactor.core.publisher.Mono;
 @Tags(@Tag(name = "place", description = "장소 검색 서비스 API"))
 public class PlaceApiController {
 
-    private final InvestProductService investProductService;
-    private final ProductValidityService productValidityService;
     private final PlaceService placeService;
 
-    public PlaceApiController(
-            InvestProductService investProductService
-            , ProductValidityService productValidityService
-            , PlaceService placeService) {
+    public PlaceApiController(PlaceService placeService) {
         this.placeService = placeService;
-        this.investProductService = investProductService;
-        this.productValidityService = productValidityService;
     }
 
     @GetMapping("")

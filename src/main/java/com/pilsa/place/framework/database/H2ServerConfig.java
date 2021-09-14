@@ -28,7 +28,9 @@ import java.sql.SQLException;
 @Slf4j
 @Configuration
 @Profile("local")
-@MapperScan(basePackages = {"com.pilsa.place.biz.**.mapper"}, sqlSessionFactoryRef = "placeSqlSessionFactory")
+@MapperScan(
+        basePackages = {"com.pilsa.place.biz.**.mapper","com.pilsa.place.common.**.mapper"},
+        sqlSessionFactoryRef = "placeSqlSessionFactory")
 public class H2ServerConfig {
 
 
@@ -64,10 +66,12 @@ public class H2ServerConfig {
         sqlSessionFactoryBean.setDataSource(placeDataSource);
         sqlSessionFactoryBean.setConfigLocation(applicationContext.getResource("classpath:mybatis/mybatis-config.xml"));
         sqlSessionFactoryBean.setTypeAliasesPackage(
-                "com.pilsa.place.biz.**.dto"
+                "com.pilsa.place.biz.**.dto"+
+                ";com.pilsa.place.common.**.dto"
         );
         sqlSessionFactoryBean.setMapperLocations(ArrayUtils.addAll(
-                applicationContext.getResources("classpath:mapper/biz/*.xml")
+                applicationContext.getResources("classpath:mapper/biz/*.xml"),
+                applicationContext.getResources("classpath:mapper/common/*.xml")
         ));
         return sqlSessionFactoryBean.getObject();
     }

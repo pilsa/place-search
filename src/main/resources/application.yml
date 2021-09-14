@@ -6,6 +6,10 @@ spring:
   profiles:
     active: local
 
+#==========================================
+# End-Point BaseURL
+# DB에서 관리하고 있으나 로컬DB 백업용 입니다.
+#==========================================
 endpoints:
   kakao:
     base-url: https://dapi.kakao.com

@@ -1,6 +1,7 @@
 package com.pilsa.place.biz.client.vo.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.pilsa.place.common.code.ApiCode;
 import com.pilsa.place.common.code.VersionInfoCode;
 import com.pilsa.place.framework.webclient.annotation.RequestHeader;
 import com.pilsa.place.framework.webclient.annotation.RequestParam;
@@ -32,8 +33,8 @@ public class KakaoRequest extends RequestBase {
     @RequestHeader(name = "Authorization")
     private String Authorization = "KakaoAK 1bff160ca1074e50c07585b91e47806b";
 
-    public KakaoRequest(VersionInfoCode versionInfoCode, String baseUrl, String uri){
-        super(versionInfoCode,baseUrl,uri);
+    public KakaoRequest(VersionInfoCode versionInfoCode, String baseUrl, String uri, ApiCode.Code apiCode){
+        super(versionInfoCode,baseUrl,uri,apiCode);
     }
 
 }

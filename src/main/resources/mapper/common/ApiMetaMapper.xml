@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pilsa.place.common.service.mapper.ApiMetaMapper">
+
+    <select id="selectApiMeta" resultType="ApiMetaDTO">
+        SELECT /** selectApiMeta | API 메타 정보 조회 */
+               API.API_CODE         /* API구분코드 */
+             , API.API_NM           /* API이름 */
+             , ALIN.ALIN_CODE       /* 기관구분코드 */
+             , ALIN.ALIN_DOMN       /* 기관도메인 */
+             , ALIN.ALIN_AUTH_DVCD  /* 기관인증구분코드 */
+             , ALIN.CLIENT_ID       /* 클라이언트ID */
+             , ALIN.CLIENT_SECRET   /* 클라이언트SECRET */
+             , ALIN.API_KEY         /* API키 */
+             , API.API_VER          /* API버전 */
+             , API.API_URI          /* APIURI */
+        FROM ALLIANCE_TM ALIN /* 기관정보 MASTER */
+             , API_TM API /* API정보 MASTER */
+        WHERE 1=1
+        AND ALIN.ALIN_CODE = API.ALIN_CODE
+    </select>
+</mapper>

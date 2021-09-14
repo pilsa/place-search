@@ -3,7 +3,9 @@ package com.pilsa.place.framework.webclient;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pilsa.place.common.code.service.ApiCodeService;
 import com.pilsa.place.common.constant.ApiConstant;
+import com.pilsa.place.common.service.ApiMetaService;
 import com.pilsa.place.framework.exception.ExternalException;
 import com.pilsa.place.framework.exception.ExternalExceptionCode;
 import com.pilsa.place.framework.webclient.annotation.PathParam;
@@ -31,30 +33,28 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-@Service("httpClient")
+/**
+ * End-Point API 요청
+ * The type Http client.
+ *
+ * @author pilsa_home1
+ * @since 2021 -09-11 오후 11:28
+ */
 @Slf4j
+@Service("httpClient")
 public class HttpClient implements CommonClient{
 
     private ReactorClientHttpConnector reactorClientHttpConnector;
+    private final ApiCodeService apiCodeService;
 
-    public HttpClient() {
-
-    }
-
-    private <T> List<Field> getAllFields(T t){
-        List<Field> fields = new ArrayList<>();
-        Class clazz = t.getClass();
-
-        while(clazz != Object.class){
-            fields.addAll(Arrays.asList(clazz.getDeclaredFields()));
-            clazz = clazz.getSuperclass();
-        }
-        return fields;
+    public HttpClient(ApiCodeService apiCodeService) {
+        this.apiCodeService = apiCodeService;
     }
 
     /**
      * sslContext 설정
-     * @throws SSLException
+     *
+     * @throws SSLException the ssl exception
      */
     @PostConstruct
     public void init() throws SSLException {
@@ -68,6 +68,7 @@ public class HttpClient implements CommonClient{
 
     /**
      * 데이터 요청(GET)
+     *
      * @param <T>
      * @param requestBase
      * @param cls
@@ -76,10 +77,10 @@ public class HttpClient implements CommonClient{
     public <T extends ResponseBase> Mono<T> requestDataByGetMono(RequestBase requestBase, Class<T> cls){
         String transactionId = MDC.get(ApiConstant.TRANSACTION_ID);
         long requestTime = System.currentTimeMillis();
+
         return WebClient.builder()
                 .clientConnector(reactorClientHttpConnector)
-                //.baseUrl("https://dapi.kakao.com")
-                .baseUrl(requestBase.getBaseUrl())
+                .baseUrl(apiCodeService.getApiMetaCodeByKey(requestBase.getApiCode()).getAlinDomn())
                 .build()
                 .get()
                 .uri(uriBuild -> uriBuild.path(replaceUri(requestBase)).queryParams(getValueMap(requestBase)).build())
@@ -106,6 +107,21 @@ public class HttpClient implements CommonClient{
                     return t;
                 }));
     }
+
+    private <T> List<Field> getAllFields(T t){
+        List<Field> fields = new ArrayList<>();
+        Class clazz = t.getClass();
+
+        while(clazz != Object.class){
+            fields.addAll(Arrays.asList(clazz.getDeclaredFields()));
+            clazz = clazz.getSuperclass();
+        }
+        return fields;
+    }
+
+
+
+
 
     /**
      * 데이터 요청(GET)
@@ -154,10 +170,11 @@ public class HttpClient implements CommonClient{
 
     /**
      * 데이터 요청(GET)
-     * @param requestBase
-     * @param cls
-     * @param <T>
-     * @return
+     *
+     * @param <T>         the type parameter
+     * @param requestBase the request base
+     * @param cls         the cls
+     * @return t t
      */
     public <T extends ResponseBase> T requestDataByGet3(RequestBase requestBase, Class<T> cls){
         String transactionId = MDC.get(ApiConstant.TRANSACTION_ID);

@@ -7,6 +7,7 @@ import com.pilsa.place.biz.client.vo.response.MergeResponse;
 import com.pilsa.place.biz.client.vo.response.MergeSimpleResponse;
 import com.pilsa.place.biz.client.vo.response.NaverResponse;
 import com.pilsa.place.biz.vo.request.PlaceRequest;
+import com.pilsa.place.common.code.ApiCode;
 import com.pilsa.place.common.code.VersionInfoCode;
 import com.pilsa.place.framework.webclient.CommonClient;
 import lombok.extern.slf4j.Slf4j;
@@ -46,6 +47,7 @@ public class ClientService {
     public Mono<KakaoResponse> callKaKaoSearch(PlaceRequest request){
         return httpClient.requestDataByGetMono(
                 KakaoRequest.builder()
+                        .apiCode(ApiCode.Code.KAKAO_SE01)
                         .baseUrl(environment.getProperty("endpoints.kakao.base-url"))
                         .uri("local/search/keyword.json")
                         .version(VersionInfoCode.V2)
