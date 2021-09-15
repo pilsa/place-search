@@ -22,6 +22,8 @@ import java.sql.SQLException;
 /**
  * The type H2DataBase server config.
  * 로컬에서만 사용하는 H2DB 설정을 정의한다.
+ * 업무 페키지 : com.pilsa.place.biz
+ * 공통 페키지 : com.pilsa.place.common
  *
  * @author pilsa_home1
  */

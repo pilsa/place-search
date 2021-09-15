@@ -31,9 +31,6 @@ import java.util.stream.Collectors;
 @Service
 public class ClientService {
 
-    @Value("${spring.profiles.active}")
-    private String profileActive;
-
     private CommonClient httpClient;
 
     /**
@@ -79,9 +76,6 @@ public class ClientService {
         return httpClient.requestDataByGetMono(
                 KakaoRequest.builder()
                         .apiCode(ApiCode.Code.KAKAO_SE01)
-                        //.baseUrl(environment.getProperty("endpoints.kakao.base-url"))
-                        //.uri("local/search/keyword.json")
-                        //.version(VersionInfoCode.V2)
                         .query(request.getQuery())
                         .size(5)
                         .build()
@@ -99,9 +93,6 @@ public class ClientService {
          return httpClient.requestDataByGetMono(
                  NaverRequest.builder()
                          .apiCode(ApiCode.Code.NAVER_SE01)
-                         //.baseUrl(environment.getProperty("endpoints.naver.base-url"))
-                         //.uri("search/local.json")
-                         //.version(VersionInfoCode.V1)
                          .query(request.getQuery())
                          .display(5)
                          .build()

@@ -21,7 +21,6 @@ import java.util.Map;
 @Aspect
 @Component
 public class ControllerAspect {
-    private static final String NUMBER_REGEX = "[0-9]+";
 
     @Pointcut("execution(* com.pilsa.place..*Controller.*(..))")
     public void controllerAdvice(){}
@@ -37,10 +36,12 @@ public class ControllerAspect {
          * HttpServletRequest 객체 생성.
         ======================================================================================*/
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+
         /*======================================================================================
          * Header 정보를 모두 가져온다. (공통으로 Header 값 검증이 필요의 경우 작성한다.)
         ======================================================================================*/
         Map<String,String> headerMap = getHeaderMap(request);
+
         /*======================================================================================
          * Controller 수행 전 공통로직을 처리한다.
         ======================================================================================*/
@@ -65,7 +66,6 @@ public class ControllerAspect {
         /*======================================================================================
          * business 에서 사용할 수 있도록 commonRequest 에 Set 한다.
         ======================================================================================*/
-        //commonRequest.setMemberNum(Long.parseLong(headerUserId));
         commonRequest.setTransactionId(MDC.get(ApiConstant.TRANSACTION_ID));
     }
 

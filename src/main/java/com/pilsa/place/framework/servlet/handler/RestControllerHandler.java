@@ -2,7 +2,6 @@ package com.pilsa.place.framework.servlet.handler;
 
 import com.pilsa.place.common.code.ResponseCode;
 import com.pilsa.place.common.constant.ApiConstant;
-import com.pilsa.place.common.web.vo.request.CommonResponse;
 import com.pilsa.place.common.web.vo.request.ErrorResponse;
 import com.pilsa.place.framework.exception.ServiceException;
 import lombok.extern.slf4j.Slf4j;
@@ -54,12 +53,11 @@ public class RestControllerHandler extends ResponseEntityExceptionHandler implem
         ======================================================================================*/
         response.getHeaders().add(ApiConstant.TRANSACTION_ID,transactionId);
 
-        return CommonResponse.builder()
+        return body;
+/*        return CommonResponse.builder()
                 .success(String.valueOf(ResponseCode.SUCCESS.isSuccess()))
-                //.code(ResponseCode.SUCCESS.getCode())
-                //.message(ResponseCode.SUCCESS.getMessage())
                 .data(body)
-                .build();
+                .build();*/
     }
 
     /**
@@ -87,14 +85,11 @@ public class RestControllerHandler extends ResponseEntityExceptionHandler implem
         /*======================================================================================
          * 애러응답
         ======================================================================================*/
-        return new ResponseEntity<>(ErrorResponse.builder()
-                .success(String.valueOf(ex.isSuccess()))
-                .errors(ErrorResponse.Errors.builder()
-                        .code(ex.getErrorCode())
-                        .message(ex.getErrorMessage())
-                        .build()).build()
+        return new ResponseEntity(ErrorResponse.builder()
+                .errorType(ex.getErrorCode())
+                .errorMessages(ex.getErrorMessage()).build()
                 ,httpHeaders
-                , ex.getHttpStatus());
+                ,ex.getHttpStatus());
     }
 
 
@@ -116,7 +111,7 @@ public class RestControllerHandler extends ResponseEntityExceptionHandler implem
         String transactionId = MDC.get(ApiConstant.TRANSACTION_ID);
         MDC.clear();
 
-        ResponseCode serverError = ResponseCode.INTERNAL_SERVER_ERROR;
+        ResponseCode serverError = ResponseCode.RESOURCE_NOT_FOUND;
         /*======================================================================================
          * 트레킹을 위한 TRANSACTION_ID를 해더에 준다.
         ======================================================================================*/
@@ -125,12 +120,9 @@ public class RestControllerHandler extends ResponseEntityExceptionHandler implem
         /*======================================================================================
          * 애러응답
         ======================================================================================*/
-        return new ResponseEntity<>(ErrorResponse.builder()
-                .success(String.valueOf(serverError.isSuccess()))
-                .errors(ErrorResponse.Errors.builder()
-                        .code(serverError.getCode())
-                        .message(serverError.getMessage())
-                        .build()).build()
+        return new ResponseEntity(ErrorResponse.builder()
+                .errorType(serverError.getCode())
+                .errorMessages(serverError.getMessage()).build()
                 ,httpHeaders
                 ,serverError.getHttpStatus());
     }
@@ -163,12 +155,9 @@ public class RestControllerHandler extends ResponseEntityExceptionHandler implem
         /*======================================================================================
          * 애러응답
         ======================================================================================*/
-        return new ResponseEntity<>(ErrorResponse.builder()
-                .success(String.valueOf(code.isSuccess()))
-                .errors(ErrorResponse.Errors.builder()
-                        .code(code.getCode())
-                        .message(getResultMessage(ex.getConstraintViolations().iterator()))
-                        .build()).build()
+        return new ResponseEntity(ErrorResponse.builder()
+                .errorType(code.getCode())
+                .errorMessages(getResultMessage(ex.getConstraintViolations().iterator())).build()
                 ,httpHeaders
                 ,code.getHttpStatus());
     }
@@ -178,12 +167,12 @@ public class RestControllerHandler extends ResponseEntityExceptionHandler implem
         while (violationIterator.hasNext() == true) {
             final ConstraintViolation<?> constraintViolation = violationIterator.next();
             resultMessageBuilder
-                    .append("[ ")
+                    .append("['")
                     .append(getPopertyName(constraintViolation.getPropertyPath().toString())) // 유효성 검사가 실패한 속성
                     .append(" 는 ")
                     //.append(constraintViolation.getInvalidValue()) // 유효하지 않은 값
                     .append(constraintViolation.getMessage()) // 유효성 검사 실패 시 메시지
-                    .append(" ]");
+                    .append(".']");
             if (violationIterator.hasNext() == true) {
                 resultMessageBuilder.append(", ");
             }

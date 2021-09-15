@@ -13,14 +13,19 @@ import springfox.documentation.service.ParameterType;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 
-
+/**
+ * 테스트를 위함.
+ *
+ * @author pilsa_home1
+ * @since 2021-09-12 오후 1:53
+ */
 @Profile("!prd")
 @Configuration
 public class SwaggerConfig {
 
-    private static final String API_NAME = "장소검색API";
+    private static final String API_NAME = "장소검색 API 서비스 ";
     private static final String API_VERSION = "1.0";
-    private static final String API_DESCRIPTION = "이진영";
+    private static final String API_DESCRIPTION = "KakaoBank 코딩테스트 - 이진영";
 
     @Bean
     public Docket api(){

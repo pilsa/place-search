@@ -280,6 +280,4 @@ public class HttpClient implements CommonClient{
                 .build());
     }*/
 
-
-
 }

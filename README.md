@@ -1,13 +1,7 @@
-# 기술 세미나 
-> 안녕하세요. :heart_eyes: 기술 세미나 발표를 위한 프로젝트 입니다.  
-> 세미나 주제 선정 기준은 `범용적`, `국제표준`, `OpenSource`, `실무적용` 입니다.  
-> 세미나 발표 내용은 해당 프로젝트에 구현되어 있습니다.  
-> 지속적인 **연재**가 가능하도록 개발환경을 구성하였습니다.  
-
-
-# Document 
-> 아래는 세미나 발표를 위한 문서입니다. `새창`으로 열어주시기 바랍니다.
-- [_1번 주제 : Validator 어디까지 써봤니?_](https://pilsa.notion.site/Bean-Validation-Hibernate-Validator-c64da73f64bb4bfab0b34ebc1897912f)
+# 장소검색 API 서비스
+> 안녕하세요. :heart_eyes: 카카오뱅크 코딩테스트를 위한 프로젝트 입니다.  
+> 구현 상의 필수 요구사항을 모두 충족하여 개발하였습니다.  
+> 감사합니다.
 
 ## Table of Contents 
 - [개발환경](#개발환경)
@@ -18,24 +12,114 @@
 - [API 명세서](#API-명세서)
 
 ## 개발환경
-* IDE : Intellij IDEA Ultimate 2021.1.1.1
-* Language : JDK 1.8.0_291
-* WAS : Embeded Tomcat
-* Build : Gradle-7.1.1
-* Test : Swagger 3.0 
-
-## 기술요소
 * Framework : spring-boot 2.3.9.RELEASE
+* Language : JDK 1.8.0_291
+* Build : Gradle-7.1.1
+* WAS : Embeded Tomcat
 * DBMS : h2Database 1.4.200 서버모드(TCP)
+* IDE : Intellij IDEA
+* Test : Swagger 3.0
+
+## 오픈소스
+* DBMS : H2Database 1.4.200 서버모드(TCP)
+  * 목적 : API정보, 기관정보, 검색이력을 설계 및 표준 SQL을 사용하기 위함.
+  * 참조 : [H2ServerConfig.java](./src/main/java/com/pilsa/place/framework/database/H2ServerConfig.java)
+* ORM : Mybatis 2.1.4
+  * 목적 : Query 작성 및 H2DB와 연계 사용하여 설계된 DataBase를 핸들링 하기 위함.
+  * 참조 : [mybatis-config.xml](./src/main/resources/mybatis/mybatis-config.xml)
 * Cache : ehcache 3.7.0
-* ORM(Object relational Mapping) : Mybatis 2.1.4
-* 기타 : lombok , hibernate-validator
+  * 목적 : DBMS의 부하를 줄이고 대용량 트래픽을 고려하여 서비스 특징에 맞게 사용함.
+  * 참조 : [EhcacheConfig.java](./src/main/java/com/pilsa/place/framework/ehcache/EhcacheConfig.java)
+* spring-boot-starter-webflux 2.3.9 (webclient)
+  * 목적 : 카카오와 네이버의 서로다른 End-Point API를 동시/병렬로 요청하여 처리속도 향상을 위함. 
+  * 참조 : [ClientService.java](./src/main/java/com/pilsa/place/biz/client/service/ClientService.java)
+* hibernate-validator 6.1.7
+  * 목적 : 데이터 유효성 검증에 대한 로직의 중복을 줄이고, 비지니스 로직과 분리하기 위함. 
+  * 참조 : [PlaceRequest.java](src/main/java/com/pilsa/place/biz/vo/request/PlaceRequest.java)
+* lombok 1.18.18
+  * 목적 : 생산성 향상 및 가독성 및 유지보수 향상을 위하여 사용함.
+  * 참조 : Request, Response, VO, DTO 등에서 전부 사용함.
 
 ## 테스트 환경  
-> Local-WAS 부트 업 이후에 아래 링크에서 테스트가 가능합니다.  
-> [기술 세미나 테스트 swagger](http://localhost:8087/swagger-ui/)
-* http://localhost:8087/swagger-ui/
-* API Base URI : `http://localhost:8087`  
+> Local-WAS 부트 업 이후에 아래 2가지 방법으로 테스트가 가능합니다.  
+> 테스트를 위하여 Swagger 설정을 하였습니다. 한번 봐주세요.:heart_eyes:
+* Swagger 테스트
+  * [장소검색 API 서비스 swagger](http://localhost:8087/swagger-ui/#/place)
+* HTTP Request file 테스트
+  * [placeSearch-api-test.http](placeSearch-api-test.http)
+
+## API 명세서
+### 1. 장소 검색 API
+> URI : http://localhost:8087/v1/place  
+> HTTP Method : GET  
+> 설명 : `query` 파라미터를 필수로 요청 받습니다.   
+> 카카오와 네이버의 검색 API에서 동일한 `query`로 각각 5개의 `size`로 요청합니다.  
+> 응답받은 결과 중 카카오 결과 네이버 결과 모두 존재하는 `place`의 경우 최상위에 정렬합니다.  
+> 둘 중 하나만 존재하는 경우 카카오 결과를 우선 정렬 후 네이버 결과를 정렬합니다.  
+> 요청받은 `query`는 `장소검색이력 테이블`에 저장합니다.    
+
+#### Request Example
+```http request
+curl --location --request GET 'http://localhost:8087/v1/place?query=휘경 어린이집'
+```
+
+#### response Example
+```json
+{
+    "meta": {
+        "totalCount": 8
+    },
+    "places": [
+        {
+            "placeName": "동화어린이집",
+            "addressName": "서울 동대문구 휘경동 282-6",
+            "roadAddressName": "서울 동대문구 망우로12가길 20",
+            "placeUrl": "http://place.map.kakao.com/12144504"
+        },
+        {
+            "placeName": "휘경스마일어린이집",
+            "addressName": "서울 동대문구 휘경동 183-381",
+            "roadAddressName": "서울 동대문구 이문로8길 8-7",
+            "placeUrl": "http://place.map.kakao.com/27368002"
+        }
+      ...중략...
+    ]
+}
+```
+
+
+### 2. 인기키워드 API
+> URI : http://localhost:8087/v1/place  
+> HTTP Method : GET  
+> 설명 : `query` 파라미터를 필수로 요청 받습니다.   
+> 카카오와 네이버의 검색 API에서 동일한 `query`로 각각 5개의 `size`로 요청합니다.  
+> 응답받은 결과 중 카카오 결과 네이버 결과 모두 존재하는 `place`의 경우 최상위에 정렬합니다.  
+> 둘 중 하나만 존재하는 경우 카카오 결과를 우선 정렬 후 네이버 결과를 정렬합니다.  
+> 요청받은 `query`는 `장소검색이력 테이블`에 저장합니다.
+#### Request Example
+```http request
+curl --location --request GET 'http://localhost:8087/v1/place/keywords'
+```
+#### response Example
+```json
+{
+  "meta": {
+    "totalCount": 10
+  },
+  "keywords": [
+    {
+      "query": "서울시청",
+      "rank": 1,
+      "queryCnt": 18
+    },
+    {
+      "query": "휘경 유치원",
+      "rank": 2,
+      "queryCnt": 12
+    }
+    ...중략...
+}
+```
 
 ## 응답코드 및 응답메시지
 
@@ -43,39 +127,6 @@
 > 성공 응답은 `data` 하위에 `body`를 응답합니다.   
 > 에러 응답은 `errors` 파라미터를 포함하고 있으며 에러 `code` 와 `message` 를 응답합니다.  
 > `HTTP상태코드` `4XX` 대 에러 경우 조치 방법을 `message` 에 안내합니다.
-
-##### 성공응답 예시
-```json
-{
-  "success": "true",
-  "data": {
-    "investProductCnt": 1,
-    "investTransactionList": [
-      {
-        "productId": "PRD0000011",
-        "productName": "공공임대주택 개발사업 수익담보 1-1",
-        "totalInvestAmt": 700000000,
-        "crntInvestAmt": 2000000,
-        "productStatus": "모집중",
-        "myInvestAmt": 2000000,
-        "transAt": "20210715064955"
-      }
-    ]
-  }
-}
-``` 
-##### 에러응답 예시
-
-```json
-{
-  "success": "false",
-  "errors": {
-    "code": "ONEC_LIMIT_EXCESS",
-    "message": "요청하신 투자금액이 1회 투자한도금액을 초과하였습니다. 해당 제공사의 1회 투자한도금액은 [5000000]입니다."
-  }
-}
-```
-
 
 ## DataBase 설계
 > h2Database 서버 모드로 구성하여 Local WAS 부트업 이후 ``TCP`` 접속이 가능합니다.   

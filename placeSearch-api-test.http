@@ -1,0 +1,73 @@
+#################################################################################
+# 장소 검색 API
+#################################################################################
+### Case1) 잘못된 URI 호출
+GET http://localhost:8087/v1/placee
+
+> {%
+    client.test("잘못된 URI 호출", function() {
+        client.log("transactionId : "+response.headers.valueOf("transactionId"))
+        client.assert(response.status == 404, "Response status is not 404");
+    });
+%}
+
+
+
+### Case2) 필수 파라미터 누락
+GET http://localhost:8087/v1/place
+
+> {%
+    client.test("필수 파라미터 누락", function() {
+        client.log("transactionId : "+response.headers.valueOf("transactionId"))
+        client.assert(response.status == 400, "Response status is not 400");
+    });
+%}
+
+
+
+### Case3) 파라미터 허용 범위 제한 : 1~100 자리의 검색어
+GET http://localhost:8087/v1/place?query=01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
+
+> {%
+    client.test("파라미터 허용 범위 제한", function() {
+        client.log("transactionId : "+response.headers.valueOf("transactionId"))
+        client.assert(response.status == 400, "Response status is not 400");
+    });
+%}
+
+
+
+### Case4) 정상 호출
+GET http://localhost:8087/v1/place?query=서울 카카오뱅크
+
+> {%
+    client.test("장소 검색 API : 정상호출", function() {
+        client.log("transactionId : "+response.headers.valueOf("transactionId"))
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}
+
+
+
+### Case5) 장상 호출 : 결과가 없을 경우 장소검색이력(PLACE_SEARCH_TH)에 누적되지 않습니다.
+GET http://localhost:8087/v1/place?query=마라도 카카오뱅크
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.log("transactionId : "+response.headers.valueOf("transactionId"))
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}
+
+
+#################################################################################
+# 인기키워드 API
+#################################################################################
+GET http://localhost:8087/v1/place/keywords
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.log("transactionId : "+response.headers.valueOf("transactionId"))
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}

@@ -7,6 +7,7 @@ import lombok.*;
 import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 /**
  *
@@ -21,6 +22,7 @@ import javax.validation.constraints.NotBlank;
 @ApiModel(value="[지역검색] - 요청", description="[지역검색] API Request 입니다.")
 public class PlaceRequest extends CommonRequest {
 
+    @NotNull
     @NotBlank
     @Length(min = 1 , max = 100)
     @ApiModelProperty(value="질의어", example = "카카오프렌즈", required = true)

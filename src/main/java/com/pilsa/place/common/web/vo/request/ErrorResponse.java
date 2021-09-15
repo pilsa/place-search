@@ -16,20 +16,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Getter
 public class ErrorResponse {
-
-    private String success;
-    private Errors errors;
-
-    /**
-     * The type Errors.
-     */
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @Getter
-    @Builder
-    public static class Errors {
-        private String code;
-        private String message;
-    }
-
+    private String errorType;
+    private String errorMessages;
 }
