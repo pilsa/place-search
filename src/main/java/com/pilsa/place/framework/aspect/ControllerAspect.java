@@ -45,23 +45,6 @@ public class ControllerAspect {
         /*======================================================================================
          * Controller 수행 전 공통로직을 처리한다.
         ======================================================================================*/
-        /*
-        String headerUserId = headerMap.get(ApiConstant.X_USER_ID);
-        if (StringUtils.isEmpty(headerUserId)){
-            throw new ServiceException(ResponseCode.INVALID_HEADER, ApiConstant.X_USER_ID);
-        }
-        if (!headerUserId.matches(NUMBER_REGEX)){
-            throw new ServiceException(ResponseCode.INVALID_PARAMETER_TYPE, ParameterTypeCode.NUMBER);
-        }
-        if (headerUserId.length()>10){
-            throw new ServiceException(ResponseCode.INVALID_PARAMETER_RANGE,ApiConstant.X_USER_ID,"0~9999999999");
-        }
-        try{
-            Long.parseLong(headerUserId);
-        } catch (NumberFormatException e){
-            throw new ServiceException(ResponseCode.INVALID_PARAMETER_RANGE,ApiConstant.X_USER_ID,"0~9999999999");
-        }
-        */
 
         /*======================================================================================
          * business 에서 사용할 수 있도록 commonRequest 에 Set 한다.

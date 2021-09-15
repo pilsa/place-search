@@ -7,9 +7,9 @@
 - [개발환경](#개발환경)
 - [기술요소](#기술요소)
 - [테스트 환경](#테스트-환경)
-- [응답코드 및 응답메시지](#응답코드-및-응답메시지)
-- [DataBase 설계](#DataBase-설계)
+- [핵심 문제해결 전략](#핵심-문제해결-전략)
 - [API 명세서](#API-명세서)
+- [DataBase 설계](#DataBase-설계)
 
 ## 개발환경
 * Framework : spring-boot 2.3.9.RELEASE
@@ -40,6 +40,7 @@
   * 목적 : 생산성 향상 및 가독성 및 유지보수 향상을 위하여 사용함.
   * 참조 : Request, Response, VO, DTO 등에서 전부 사용함.
 
+
 ## 테스트 환경  
 > Local-WAS 부트 업 이후에 아래 2가지 방법으로 테스트가 가능합니다.  
 > 테스트를 위하여 Swagger 설정을 하였습니다. 한번 봐주세요.:heart_eyes:
@@ -47,6 +48,22 @@
   * [장소검색 API 서비스 swagger](http://localhost:8087/swagger-ui/#/place)
 * HTTP Request file 테스트
   * [placeSearch-api-test.http](placeSearch-api-test.http)
+
+## 핵심 문제해결 전략
+![data-modeling](img/place-sequence.png)
+* 대용량 트래픽
+  * 카카오와 네이버의 다른 End-Point를 WebClient Mono Zip을 이용하여 병렬 호출한 후 응답을 통합하여 반환합니다.
+  * 검색한 이력을 비동기, 신규 트렉젝션으로 저장하여 빠르고 안전하게 API를 응답합니다. (부모의 transactionId는 유지)
+  * 장소검색이력 테이블에 시간정보 컬럼에 Index 생성과 int tpye 설계로 빠른 조회가 가능합니다.
+  * 인기 키워드 API 조회 시 5초(timeToLive) 동안 유효한 Cache에 저장되어 DB부하를 줄입니다.
+  
+* 서비스 확장성, 장애 대응
+  * 기관정보, API정보 DB를 설계하여 Cache에 저장 하도록 처리하였습니다.  
+    신규 API 개발시 Client 프로그램을 추가로 개발할 필요가 없습니다. [HttpClient.java](src/main/java/com/pilsa/place/framework/webclient/HttpClient.java), [ApiCodeService.java](src/main/java/com/pilsa/place/common/code/service/ApiCodeService.java)
+  * Controller AOP를  [ControllerAspect.java](src/main/java/com/pilsa/place/framework/aspect/ControllerAspect.java)적용하여 공통 로직을 처리합니다. 
+  * 다수의 인스턴스 환경에서도 유니크한 transactionId를 [FilterConfig.java](src/main/java/com/pilsa/place/framework/servlet/filter/FilterConfig.java) 에서 채번 하였습니다.  
+    API 장애 시 거래에 대한 추적을 위하여 Slf4j-MDC를 활용, API 응답 Header값에 함께 반환합니다.
+
 
 ## API 명세서
 ### 1. 장소 검색 API

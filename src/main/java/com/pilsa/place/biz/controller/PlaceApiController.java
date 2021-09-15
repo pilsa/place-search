@@ -53,14 +53,4 @@ public class PlaceApiController {
     }
 
 
-    // TODO : 테스트용도
-    @GetMapping("/kakao-mono")
-    @ApiOperation(
-            value = "장소 검색 API", tags = "place",
-            notes = "카카오와 네이버의 리소스를 활용 하여 어쩌구")
-    public Mono<KakaoResponse> localSearchKeywordMono(PlaceRequest request){
-        Mono<KakaoResponse> res = placeService.searchPlaceMono(request);
-        return res;
-    }
-
 }
