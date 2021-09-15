@@ -1,5 +1,5 @@
 # 장소검색 API 서비스
-> 안녕하세요. :heart_eyes: 카카오뱅크 코딩테스트를 위한 프로젝트 입니다.  
+> 안녕하세요. 카카오뱅크 코딩테스트를 위한 프로젝트 입니다. :heart_eyes:  
 > 구현 상의 필수 요구사항을 모두 충족하여 개발하였습니다.  
 > 감사합니다.
 
@@ -56,7 +56,8 @@
 > 카카오와 네이버의 검색 API에서 동일한 `query`로 각각 5개의 `size`로 요청합니다.  
 > 응답받은 결과 중 카카오 결과 네이버 결과 모두 존재하는 `place`의 경우 최상위에 정렬합니다.  
 > 둘 중 하나만 존재하는 경우 카카오 결과를 우선 정렬 후 네이버 결과를 정렬합니다.  
-> 요청받은 `query`는 `장소검색이력 테이블`에 저장합니다.    
+> 요청받은 `query`는 `장소검색이력 테이블`에 저장합니다. 단 검색 결과가 0건인 경우 저장하지 않습니다.   
+> 키워드 저장 시 장소 검색 `Transaction` 과 분리하여 `Async` 호출합니다.
 
 #### Request Example
 ```http request
@@ -89,13 +90,15 @@ curl --location --request GET 'http://localhost:8087/v1/place?query=휘경 어�
 
 
 ### 2. 인기키워드 API
-> URI : http://localhost:8087/v1/place  
+> URI : http://localhost:8087/v1/place/keywords  
 > HTTP Method : GET  
-> 설명 : `query` 파라미터를 필수로 요청 받습니다.   
-> 카카오와 네이버의 검색 API에서 동일한 `query`로 각각 5개의 `size`로 요청합니다.  
-> 응답받은 결과 중 카카오 결과 네이버 결과 모두 존재하는 `place`의 경우 최상위에 정렬합니다.  
-> 둘 중 하나만 존재하는 경우 카카오 결과를 우선 정렬 후 네이버 결과를 정렬합니다.  
-> 요청받은 `query`는 `장소검색이력 테이블`에 저장합니다.
+> 설명 : `키워드`는 분포 및 빈도수 계산을 위하여 `장소검색이력 테이블`에 `시간`정보와 함께 저장됩니다.  
+> 기본은 24시간 범위 안에 검색한 인기 키워드의 순위가 최대 10개까지 제공됩니다.  
+> 범위 검색의 조건으로 사용하는 `TRANS_AT(거래일시)` 컬럼에 `INDEX`를 설정 하였고,  
+> `int` type 으로 설계되었습니다. `UNIX_TIMESTAMP`를 사용하여 빠른 조회가 가능합니다.  
+> 또한 조회된 인기 키워드 결과는 Cache에 저장되며 `5초`(timeToLive) 동안만 유효합니다.   
+
+
 #### Request Example
 ```http request
 curl --location --request GET 'http://localhost:8087/v1/place/keywords'
@@ -121,12 +124,17 @@ curl --location --request GET 'http://localhost:8087/v1/place/keywords'
 }
 ```
 
-## 응답코드 및 응답메시지
+### 3. 에러 응답
 
-> 모든 응답은 `success` 파라미터를 포함하고 있으며 성공 응답에는 `true` 실패응답에는 `false`를 응답합니다.  
-> 성공 응답은 `data` 하위에 `body`를 응답합니다.   
-> 에러 응답은 `errors` 파라미터를 포함하고 있으며 에러 `code` 와 `message` 를 응답합니다.  
-> `HTTP상태코드` `4XX` 대 에러 경우 조치 방법을 `message` 에 안내합니다.
+> 모든 에러 응답은 `errorType`과 `errorMessages`를 포함하고 있습니다.  
+> HTTP 상태코드가 `4XX`대의 에러인 경우 조치 방법을 `message`에 안내합니다.
+#### Error response Example
+```json
+{
+    "errorType": "MissingRequiredParameters",
+    "errorMessages": "['query 는 길이가 1에서 100 사이여야 합니다.']"
+}
+```
 
 ## DataBase 설계
 > h2Database 서버 모드로 구성하여 Local WAS 부트업 이후 ``TCP`` 접속이 가능합니다.   
@@ -136,109 +144,13 @@ curl --location --request GET 'http://localhost:8087/v1/place/keywords'
 * UserName: `pilsa115`
 * password : `pilsa115`   
 
-![data-modeling](./img/Database-model.png)
+![data-modeling](img/Database-model_place.png)
 
+#### :floppy_disk: 기관정보 테이블 (ALLIANCE_TM) 설계
+![INVEST_PRODUCT_TM](./img/ALLIANCE_TM.png)
 
-#### :floppy_disk: 투자상품 기본 (INVEST_PRODUCT_TM) 설계
-![INVEST_PRODUCT_TM](./img/INVEST_PRODUCT_TM.jpg)
+#### :floppy_disk: API정보 테이블 (API_TM) 설계
+![INVEST_PRODUCT_TF](./img/API_TM.png)
 
-#### :floppy_disk: 투자상품 상세 (INVEST_PRODUCT_TF) 설계
-![INVEST_PRODUCT_TF](./img/INVEST_PRODUCT_TF.jpg)
-
-#### :floppy_disk: 투자상품 거래내역  (INVEST_PRODUCT_TH) 설계
-![INVEST_PRODUCT_TH](./img/INVEST_PRODUCT_TH.jpg)
-
-#### :floppy_disk: 투자연계금융기관 기본 (INVEST_ALLIANCE_TM) 설계
-![INVEST_ALLIANCE_TM](./img/INVEST_ALLIANCE_TM.jpg)
-
-
-
-
-## API 명세서 ( 기능 및 제약사항 )
-### 전체 투자 상품 조회 API
-
-> URI : /v1/invest/products  
-> HTTP Method : POST
-- 등록되어 있는 투자상품 중 (투자시작일시 ~ 투자종료일시) 내의 상품 목록을 응답합니다.  
-- 0 ~ 9999999999 범위의 숫자형태의 사용자 식별값을 검증합니다.
-- 정렬옵션은 `optional`하며 `INCOME`(높은수익률순), `PERIOD`(짧은기간순), `CLOSING`(마감임박순)의 예약어를 사용합니다.
-
-
-##### 요청메시지 명세
-
-| HTTP | 항목명 | 항목설명 | 필수 | 타입 | 설명 | 
-| --- | --- | --- | --- | --- | --- |
-| Header | x-user-id | 사용자 식별값 | Y | `Number` | 요청하는 사용자의 식별값 |
-| Body | sortOption | 정렬옵션 | N | `String` | 높은수익률순, 짧은기간순, 마감임박순 |
-#####  응답메시지 명세
-| HTTP | 항목명 | 항목설명 | 필수 | 타입 | 설명 | 
-| --- | --- | --- | --- | --- | --- |
-| Header | transactionId | 거래ID | Y | `STRING` | 트렌젝션 단위의 거래 식별값 |
-| Body | investProductCnt | 투자상품목록수 | Y | `NUMBER` | 투자 상품 목록의 건수 |
-| Body | investProductList | 투자상품목록 | Y | `OBJECT` | 투자 상품 목록 |
-| Body | -- productId | 상품ID | Y | `STRING` | 투자상품 고유 관리번호 |
-| Body | -- productType | 상품구분코드 | Y | `STRING` | 01:부동산담보, 02:부동산PF, 03:신용 |
-| Body | -- productName | 상품이름 | Y | `STRING` | 해당 상품의 상품명 |
-| Body | -- productDsc | 상품설명 | N | `STRING` | 해당 상품의 상품 설명 |
-| Body | -- intRate | 적용이율 | Y | `DECIMAL` | 해당 상품에 적용 이율 |
-| Body | -- totalInvestAmt | 총모집금액 | Y | `NUMBER` | 설정된 최대 투자 모집 금액, 통화코드는 KRW(원) |
-| Body | -- startedAt | 투자시작일시 | Y | `DATETIME` | 설정된 투자 모집 시작일시 |
-| Body | -- finishedAt | 투자종료일시 | Y | `DATETIME` | 설정된 투자 모집 종료일시 |
-| Body | -- allianceCode | 투자연계금융기관코드 | Y | `STRING` | PPF, TGF, TRF |
-| Body | -- allianceNm | 투자연계금융기관명 | Y | `STRING` | 피플펀드,투게더펀딩,테라펀딩 |
-| Body | -- investPeriod | 투자기간 | Y | `NUMBER` | 월 단위 투자 약정 기간 |
-| Body | -- productStatus | 상품상태 | Y | `STRING` | 초기상태, 모집중, 모집완료, 상환중, 상환완료, 종료 |
-| Body | -- crntInvestAmt | 현재모집금액 | N | `NUMBER` | 해당 상품에 현재 까지 모집된 총 투자금액 |
-| Body | -- crntInvestCnt | 현재투자자수 | N | `NUMBER` | 해당 상품에 투자한 누적 투자자 건수 |
-  
-  
-### 투자하기 API
-> URI : /v1/invest  
-> HTTP Method : POST
-- 사용자 식별값은 숫자형태의 `0 ~ 9999999999` 범위의 가지며 필수 파라미터 입니다.  
-- 상품ID는 10자리로 입력을 받습니다.  
-- `최소 투자 금액 검증` : 투자 금액은 `최소 1만원` 부터 가능합니다.  
-- `1회 투자 한도 검증` : 회원의 투자요청금액이 해당 제공사 별 `1회투자한도금액`을 초과했는지 검증합니다.
-- `동일 투자 상품 검증` : 회원이 `동일상품`에 투자한 이력이 있는지 검증합니다. 
-- `부동산투자 한도 검증` : 투자요청한 상품이 부동산(담보/PF)일 경우 해당 제공사의 `부동산투자한도금액`을 초과했는지 검증합니다.
-- `최대 투자 한도 검증` : 투자한 누적금액이 업권통합한도 또는 제공사 별 투자한도를 초과했는지 검증합니다. (온투라이센스 여부)  
-- `상품 총모집금액 검증` : (투자요청금액 + 상품의 현재모집금액) 가 (해당 상품의 총모집금액)을 초과하였는지 검증합니다.
-- 상품의 총 투자모집 금액을 넘어서면 `모집완료` 상태를 응답합니다.
-
-##### 요청메시지 명세
-| HTTP | 항목명 | 항목설명 | 필수 | 타입 | 설명 | 
-| --- | --- | --- | --- | --- | --- |
-| Header | x-user-id | 사용자 식별값 | Y | `Number` | 요청하는 사용자의 식별값 |
-| Body | productId | 상품ID | Y | `STRING` | 투자상품 고유 관리번호 |
-| Body | investAmount | 투자금액 | N | `NUMBER` | 사용자가 투자하려는 금액 |
-#####  응답메시지 명세
-| HTTP | 항목명 | 항목설명 | 필수 | 타입 | 설명 | 
-| --- | --- | --- | --- | --- | --- |
-| Header | transactionId | 거래ID | Y | `STRING` | 트렌젝션 단위의 거래 식별값 |
-| Body | productStatus | 상품상태 | Y | `NUMBER` | 초기상태, 모집중, 모집완료, 상환중, 상환완료, 종료 |
-| Body | productStatusCode | 상품상태코드 | Y | `NUMBER` | 01, 02, 03, 04, 05, 99 | 
-
-
-### 나의 투자상품 조회 API
-> URI: /v1/invest/transactions  
-> HTTP Method : POST  
-- 사용자 식별값은 숫자형태의 `0 ~ 9999999999` 범위의 가지며 필수 파라미터 입니다.  
-- 사용자가 투자한 모든 상품을 반환합니다.
-
-##### 요청메시지 명세
-| HTTP | 항목명 | 항목설명 | 필수 | 타입 | 설명 | 
-| --- | --- | --- | --- | --- | --- |
-| Header | x-user-id | 사용자 식별값 | Y | `Number` | 요청하는 사용자의 식별값 |
-#####  응답메시지 명세
-| HTTP | 항목명 | 항목설명 | 필수 | 타입 | 설명 | 
-| --- | --- | --- | --- | --- | --- |
-| Header | transactionId | 거래ID | Y | `STRING` | 트렌젝션 단위의 거래 식별값 |
-| Body | investProductCnt | 투자상품목록수 | Y | `NUMBER` | 투자 상품 목록의 건수 |
-| Body | investTransactionList | 투자상품목록 | Y | `OBJECT` | 투자 상품 목록 |
-| Body | -- productId | 상품ID | Y | `STRING` | 투자상품 고유 관리번호 |
-| Body | -- productName | 상품이름 | Y | `STRING` | 해당 상품의 상품명 |
-| Body | -- totalInvestAmt | 총모집금액 | Y | `NUMBER` | 해당 설정된 최대 투자 모집 금액, 통화코드는 KRW(원) |
-| Body | -- crntInvestAmt | 현재모집금액 | Y | `NUMBER` | 해당 상품에 현재 까지 모집된 총 투자금액 |
-| Body | -- productStatus | 상품상태 | Y | `STRING` | 초기상태, 모집중, 모집완료, 상환중, 상환완료, 종료 |
-| Body | -- myInvestAmt | 나의투자금액 | Y | `NUMBER` | 사용자가 상품에 투자한 금액 |
-| Body | -- transAt | 투자일시 | Y | `DATETIME` | 사용자가 거래한 일시  |
+#### :floppy_disk: 장소검색이력 테이블 (PLACE_SEARCH_TH) 설계
+![INVEST_ALLIANCE_TM](./img/PLACE_SEARCH_TH.png)
