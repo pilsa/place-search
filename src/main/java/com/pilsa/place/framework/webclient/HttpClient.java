@@ -3,9 +3,10 @@ package com.pilsa.place.framework.webclient;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pilsa.place.common.code.ApiMetaCode;
+import com.pilsa.place.common.code.AuthTypeCode;
 import com.pilsa.place.common.code.service.ApiCodeService;
 import com.pilsa.place.common.constant.ApiConstant;
-import com.pilsa.place.common.service.ApiMetaService;
 import com.pilsa.place.framework.exception.ExternalException;
 import com.pilsa.place.framework.exception.ExternalExceptionCode;
 import com.pilsa.place.framework.webclient.annotation.PathParam;
@@ -77,17 +78,23 @@ public class HttpClient implements CommonClient{
     public <T extends ResponseBase> Mono<T> requestDataByGetMono(RequestBase requestBase, Class<T> cls){
         String transactionId = MDC.get(ApiConstant.TRANSACTION_ID);
         long requestTime = System.currentTimeMillis();
+        ApiMetaCode apiMeta = apiCodeService.getApiMetaCodeByKey(requestBase.getApiCode());
 
         return WebClient.builder()
                 .clientConnector(reactorClientHttpConnector)
-                .baseUrl(apiCodeService.getApiMetaCodeByKey(requestBase.getApiCode()).getAlinDomn())
+                .baseUrl(apiMeta.getAlinDomn())
                 .build()
                 .get()
                 .uri(uriBuild -> uriBuild.path(replaceUri(requestBase)).queryParams(getValueMap(requestBase)).build())
 
                 .headers(httpHeaders -> {
-                    //httpHeaders.setBearerAuth(getAccessToken(requestBase));
-                    //httpHeaders.set("Authorization", "KakaoAK 1bff160ca1074e50c07585b91e47806b");
+                    if (apiMeta.getAlinAuthDvcd().equals(AuthTypeCode.API_KEY)){
+                        httpHeaders.set("Authorization", apiMeta.getApiKey());
+
+                    } else if (apiMeta.getAlinAuthDvcd().equals(AuthTypeCode.ID_SECRET)){
+                        httpHeaders.set("X-Naver-Client-Id", apiMeta.getClientId());
+                        httpHeaders.set("X-Naver-Client-Secret", apiMeta.getClientSecret());
+                    }
                     setHeaders(requestBase, httpHeaders);
                 })
                 .exchange()
@@ -103,25 +110,9 @@ public class HttpClient implements CommonClient{
                     if(!ExternalExceptionCode.SUCCESS.getResponseCode().equals(t.getResponseCode())) {
                         throw new ExternalException(t.getResponseCode(), t.getResponseMessage(), ExternalExceptionCode.findByResponseCode(t.getResponseCode()));
                     }*/
-
                     return t;
                 }));
     }
-
-    private <T> List<Field> getAllFields(T t){
-        List<Field> fields = new ArrayList<>();
-        Class clazz = t.getClass();
-
-        while(clazz != Object.class){
-            fields.addAll(Arrays.asList(clazz.getDeclaredFields()));
-            clazz = clazz.getSuperclass();
-        }
-        return fields;
-    }
-
-
-
-
 
     /**
      * 데이터 요청(GET)
@@ -133,20 +124,25 @@ public class HttpClient implements CommonClient{
     public <T extends ResponseBase> T requestDataByGet(RequestBase requestBase, Class<T> cls){
         String transactionId = MDC.get(ApiConstant.TRANSACTION_ID);
         long requestTime = System.currentTimeMillis();
+        ApiMetaCode apiMeta = apiCodeService.getApiMetaCodeByKey(requestBase.getApiCode());
 
         return WebClient.builder()
                 .clientConnector(reactorClientHttpConnector)
-                .baseUrl("https://dapi.kakao.com")
+                .baseUrl(apiMeta.getAlinDomn())
                 .build()
                 .get()
                 .uri(uriBuild -> uriBuild.path(replaceUri(requestBase)).queryParams(getValueMap(requestBase)).build())
 
                 .headers(httpHeaders -> {
-                    //httpHeaders.setBearerAuth(getAccessToken(requestBase));
-                    httpHeaders.set("Authorization", "KakaoAK 1bff160ca1074e50c07585b91e47806b");
+                    if (apiMeta.getAlinAuthDvcd().equals(AuthTypeCode.API_KEY)){
+                        httpHeaders.set("Authorization", apiMeta.getApiKey());
+
+                    } else if (apiMeta.getAlinAuthDvcd().equals(AuthTypeCode.ID_SECRET)){
+                        httpHeaders.set("X-Naver-Client-Id", apiMeta.getClientId());
+                        httpHeaders.set("X-Naver-Client-Secret", apiMeta.getClientSecret());
+                    }
                     setHeaders(requestBase, httpHeaders);
                 })
-
                 .exchange()
                 .onErrorResume(e-> {
                     log.error("[" + transactionId + "] " + e.toString(), e);
@@ -156,76 +152,24 @@ public class HttpClient implements CommonClient{
                 .flatMap(clientResponse -> clientResponse.bodyToMono(cls).map(t -> {
                     logApis(transactionId, requestBase, t);
                     //loggingApiRequest(transactionId, transactionId, requestTime, clientResponse.statusCode().value(), requestBase);
-
                     /*
                     if(!ExternalExceptionCode.SUCCESS.getResponseCode().equals(t.getResponseCode())) {
                         throw new ExternalException(t.getResponseCode(), t.getResponseMessage(), ExternalExceptionCode.findByResponseCode(t.getResponseCode()));
                     }*/
-
-                    return t;
-                }))
-                .block();
-    }
-
-
-    /**
-     * 데이터 요청(GET)
-     *
-     * @param <T>         the type parameter
-     * @param requestBase the request base
-     * @param cls         the cls
-     * @return t t
-     */
-    public <T extends ResponseBase> T requestDataByGet3(RequestBase requestBase, Class<T> cls){
-        String transactionId = MDC.get(ApiConstant.TRANSACTION_ID);
-        long requestTime = System.currentTimeMillis();
-
-        return WebClient.builder().baseUrl("https://dapi.kakao.com")
-                .build()
-                .get()
-                .uri(uriBuild -> uriBuild.path(replaceUri(requestBase)).queryParams(getValueMap(requestBase)).build())
-
-                .headers(httpHeaders -> {
-                    //httpHeaders.setBearerAuth(getAccessToken(requestBase));
-                    httpHeaders.set("Authorization", "KakaoAK 1bff160ca1074e50c07585b91e47806b");
-                    setHeaders(requestBase, httpHeaders);
-
-                })
-
-                .exchange()
-                .onErrorResume(e-> {
-                    log.error("[" + transactionId + "] " + e.toString(), e);
-                    //loggingApiRequest(transactionId, transactionId, requestTime, HttpStatus.SERVICE_UNAVAILABLE.value(), requestBase);
-                    return Mono.error(new ExternalException(ExternalExceptionCode.ERROR));
-                })
-                .flatMap(clientResponse -> clientResponse.bodyToMono(cls).map(t -> {
-                    logApis(transactionId, requestBase, t);
-                    //loggingApiRequest(transactionId, transactionId, requestTime, clientResponse.statusCode().value(), requestBase);
-
-                    if(!ExternalExceptionCode.SUCCESS.getResponseCode().equals(t.getResponseCode())) {
-                        throw new ExternalException(t.getResponseCode(), t.getResponseMessage(), ExternalExceptionCode.findByResponseCode(t.getResponseCode()));
-                    }
-
                     return t;
                 }))
                 .block();
     }
 
     /**
-     * 업권별 URI 셋팅
+     * API 별 URI 셋팅
      * @param requestBase
      * @return
      */
     private String replaceUri(RequestBase requestBase){
-
-        //String uri = apiCodeService.getValueByKey(requestBase.getApiCode());
-        //String uri = "local/search/keyword.json";
-        String uri = requestBase.getUri();
-
+        String uri = apiCodeService.getApiMetaCodeByKey(requestBase.getApiCode()).getApiUri();
         for(Field field : getAllFields(requestBase)){
-
             PathParam pathParam = field.getAnnotation(PathParam.class);
-
             if(pathParam != null && !"".equals(pathParam.name())){
                 try {
                     field.setAccessible(true);
@@ -237,9 +181,7 @@ public class HttpClient implements CommonClient{
                 }
             }
         }
-        //return requestBase.getVersion().getVersion() + "/".concat(domainCode) + uri;
-        String rtnUri = requestBase.getVersion().getVersion() + "/".concat(uri);
-        return rtnUri;
+        return apiCodeService.getApiMetaCodeByKey(requestBase.getApiCode()).getApiVer().getVersion().concat("/").concat(uri);
     }
 
     /**
@@ -255,7 +197,9 @@ public class HttpClient implements CommonClient{
 
             try {
                 field.setAccessible(true);
-                if(requestParam != null && !"".equals(requestParam.name()) && (requestParam.isIncludeZero() || (field.get(requestBase) != null && !"0".equals(String.valueOf(field.get(requestBase)))))){
+                if(requestParam != null && !"".equals(requestParam.name())
+                        && (requestParam.isIncludeZero() || (field.get(requestBase) != null
+                        && !"0".equals(String.valueOf(field.get(requestBase)))))){
                     params.add(requestParam.name(), requestParam.exceptValue() ? "" : String.valueOf(field.get(requestBase)));
                 }
                 field.setAccessible(false);
@@ -264,41 +208,7 @@ public class HttpClient implements CommonClient{
                 log.error("Set Parameter Error {}", e.getLocalizedMessage());
             }
         }
-
         return params;
-    }
-
-/*    private void loggingApiRequest(String transactionId, String globalId, long requestTime, int responseCode, RequestBase requestBase){
-
-        apiLogService.saveApiRequest(ApiLogRequest.builder()
-                .mbno(requestBase.getMbno())
-                .allianceCode(requestBase.getAllianceCode())
-                .serviceCode(requestBase.getServiceCode())
-                .apiCode(requestBase.getApiCode())
-                .globalId(globalId)
-                .transactionId(transactionId)
-                .responseCode(responseCode)
-                .requestDateTime(requestTime)
-                .responseDateTime(System.currentTimeMillis())
-                .transmissionTypeCode(requestBase.isScheduled() ? "02": "01")
-                .build());
-    }*/
-
-    private void logApis(String globalId, RequestBase request, ResponseBase response){
-        ObjectMapper objectMapper = new ObjectMapper();
-
-        objectMapper.setDefaultPropertyInclusion(JsonInclude.Include.NON_DEFAULT);
-        try {
-            MDC.put("globalId", globalId);
-            MDC.put("request", objectMapper.writeValueAsString(request));
-            MDC.put("response", objectMapper.writeValueAsString(response));
-
-            log.info("apiLog");
-
-            MDC.clear();
-
-        } catch (JsonProcessingException ignore) {
-        }
     }
 
     /**
@@ -323,7 +233,53 @@ public class HttpClient implements CommonClient{
                 log.error("Set Header Error {}", e.getLocalizedMessage());
             }
         }
-
     }
+
+    private void logApis(String globalId, RequestBase request, ResponseBase response){
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        objectMapper.setDefaultPropertyInclusion(JsonInclude.Include.NON_DEFAULT);
+        try {
+            MDC.put("globalId", globalId);
+            MDC.put("request", objectMapper.writeValueAsString(request));
+            MDC.put("response", objectMapper.writeValueAsString(response));
+
+            log.info("apiLog");
+
+            MDC.clear();
+
+        } catch (JsonProcessingException ignore) {
+        }
+    }
+
+    private <T> List<Field> getAllFields(T t){
+        List<Field> fields = new ArrayList<>();
+        Class clazz = t.getClass();
+
+        while(clazz != Object.class){
+            fields.addAll(Arrays.asList(clazz.getDeclaredFields()));
+            clazz = clazz.getSuperclass();
+        }
+        return fields;
+    }
+
+
+/*    private void loggingApiRequest(String transactionId, String globalId, long requestTime, int responseCode, RequestBase requestBase){
+
+        apiLogService.saveApiRequest(ApiLogRequest.builder()
+                .mbno(requestBase.getMbno())
+                .allianceCode(requestBase.getAllianceCode())
+                .serviceCode(requestBase.getServiceCode())
+                .apiCode(requestBase.getApiCode())
+                .globalId(globalId)
+                .transactionId(transactionId)
+                .responseCode(responseCode)
+                .requestDateTime(requestTime)
+                .responseDateTime(System.currentTimeMillis())
+                .transmissionTypeCode(requestBase.isScheduled() ? "02": "01")
+                .build());
+    }*/
+
+
 
 }

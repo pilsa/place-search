@@ -15,7 +15,7 @@ public class SystemProperties {
      * ======================================================================================
      * instance.id 설명 (was-instans)
      * - ACTIVE_PROFILE : 시스템 환경 코드 (l:로컬,d:개발,s:테스트,p:운영)
-     * - APPLICATION_CODE : application 코드약어
+     * - APPLICATION_CODE : api
      * - INSTANCE_NODE : node 번호 (11:1번WAS의 1번째instans 22:2번WAS의 2번째 instans)
      * =======================================================================================
      */

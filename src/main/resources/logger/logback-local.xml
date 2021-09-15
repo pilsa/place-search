@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration scan="true">
     <springProperty name="LOGS_FILE_PATH" source="logging.file.path" defaultValue="/logs"/>
-    <springProperty name="SYSTEM_NAME" source="project.name" defaultValue="default"/>
+    <springProperty name="SYSTEM_NAME" source="system.application-name" defaultValue="default"/>
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
@@ -10,12 +10,15 @@
     </appender>
 
     <logger name="org.springframework" level="info"/>
+    <logger name="org.springframework.web.filter.CommonsRequestLoggingFilter" level="debug"/>
+    <logger name="com.pilsa.place" level="debug"/>
     <logger name="org.apache" level="info"/>
-    <logger name="jdbc.sqlonly" level="info"/>
-    <logger name="jdbc.sqltiming" level="info"/>
-    <logger name="jdbc.resultsettable" level="info"/>
+    <logger name="jdbc.sqlonly" level="debug"/>
+    <logger name="jdbc.sqltiming" level="debug"/>
+    <logger name="jdbc.resultsettable" level="debug"/>
     <logger name="reactor" level="info"/>
     <logger name="io.netty" level="info"/>
+    <logger name="com.zaxxer.hikari.pool" level="info"/>
 
     <root level="debug">
         <appender-ref ref="STDOUT"/>

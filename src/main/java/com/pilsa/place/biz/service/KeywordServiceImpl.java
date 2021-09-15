@@ -30,18 +30,24 @@ public class KeywordServiceImpl implements keywordService {
     @Override
     public void saveSearchHistoryAsync(PlaceRequest request) {
 
-        log.debug("@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Async Start "+MDC.get(ApiConstant.TRANSACTION_ID));
-        placeSearchMapper.insertSearchHistory(PlaceTransactionDTO.builder()
-                .query("REQUIRES_NEW")
-                .build());
-
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        if (log.isDebugEnabled()){
+            log.debug("Async & RequiresNew Test TRANSACTION_ID : {}",MDC.get(ApiConstant.TRANSACTION_ID));
         }
-        log.debug("@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Async End "+MDC.get(ApiConstant.TRANSACTION_ID));
-        throw new ServiceException(ResponseCode.TIMEOUT);
+
+        placeSearchMapper.insertSearchHistory(PlaceTransactionDTO.builder()
+                .query(request.getQuery())
+                .build());
+        /** ======================================================================================
+         * transaction 분리 및 비동기 테스트를 위함.
+        ======================================================================================= */
+        if (false) {
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            throw new ServiceException(ResponseCode.TIMEOUT);
+        }
     }
 
 }

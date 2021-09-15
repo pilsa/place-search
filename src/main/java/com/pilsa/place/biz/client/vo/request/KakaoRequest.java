@@ -28,10 +28,10 @@ public class KakaoRequest extends RequestBase {
     @RequestParam(name="size")
     private int size = 5; // 한 페이지에 보여질 문서의 개수 1~15 사이의 값 (기본값: 15)
 
-    @JsonIgnore
+/*    @JsonIgnore
     @Builder.Default
     @RequestHeader(name = "Authorization")
-    private String Authorization = "KakaoAK 1bff160ca1074e50c07585b91e47806b";
+    private String Authorization = "KakaoAK 1bff160ca1074e50c07585b91e47806b";*/
 
     public KakaoRequest(VersionInfoCode versionInfoCode, String baseUrl, String uri, ApiCode.Code apiCode){
         super(versionInfoCode,baseUrl,uri,apiCode);

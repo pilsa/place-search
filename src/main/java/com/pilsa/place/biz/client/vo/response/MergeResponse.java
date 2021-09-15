@@ -6,7 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * KaKao 키워드로 장소 검색 API Response 입니다.
+ * {@link KakaoResponse} 와 {@link NaverResponse}가 통합된 Response 입니다.
+ *
  * @author pilsa_home1
  * @since 2021-09-10 오후 10:15
  */

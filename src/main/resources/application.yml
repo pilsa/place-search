@@ -16,3 +16,13 @@ endpoints:
   naver:
     base-url: https://openapi.naver.com
 
+#==========================================
+# application system configurations
+#==========================================
+system:
+  #===============================================
+  # 시스템 속성 정의 : SKYNET
+  #===============================================
+  application-name: place-search
+  keyword-cache:
+    live-seconds: 5

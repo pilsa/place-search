@@ -1,0 +1,12 @@
+# curl --location --request GET http://localhost:8087/v1/place?query=휘경마트
+GET http://localhost:8087/v1/place?query=휘경마트
+
+###
+
+GET http://localhost:8087/v1/place?query=휘경마트
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}

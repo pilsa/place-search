@@ -28,7 +28,7 @@ public class NaverRequest extends RequestBase {
     @RequestParam(name="display")
     private int display = 5; // 1(기본값), 5(최대) 검색 결과 출력 건수 지정
 
-    @JsonIgnore
+/*    @JsonIgnore
     @Builder.Default
     @RequestHeader(name = "X-Naver-Client-Id")
     private String ClientId = "bQA_gDDbrN0lWFXuhWeE";
@@ -36,7 +36,7 @@ public class NaverRequest extends RequestBase {
     @JsonIgnore
     @Builder.Default
     @RequestHeader(name = "X-Naver-Client-Secret")
-    private String ClientSecret = "BES5HWgEZp";
+    private String ClientSecret = "BES5HWgEZp";*/
 
     public NaverRequest(VersionInfoCode versionInfoCode, String baseUrl, String uri, ApiCode.Code apiCode){
         super(versionInfoCode,baseUrl,uri,apiCode);

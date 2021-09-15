@@ -5,19 +5,19 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 /**
- * The enum Product type code.
+ * The enum Product status code.
  *
  * @author pilsa_home1
  */
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public enum ProductTypeCode implements EnumCode{
+public enum AuthTypeCode {
 
-    REALTY("01", "부동산담보"),
-    REALTY_PF("02", "부동산PF"),
-    CREDIT("03", "신용");
+    API_KEY,
+    ID_SECRET;
 
     private String key;
     private String value;
+
 }

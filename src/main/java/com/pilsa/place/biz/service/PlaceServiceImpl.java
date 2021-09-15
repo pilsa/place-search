@@ -13,7 +13,6 @@ import com.pilsa.place.biz.vo.response.PlaceResponse;
 import com.pilsa.place.common.constant.ApiConstant;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -34,19 +33,17 @@ import java.util.stream.Collectors;
 @Service
 public class PlaceServiceImpl implements PlaceService {
 
-    @Value("${spring.profiles.active}")
-    private String profileActive;
-
     private final ClientService clientService;
     private final keywordService keywordService;
     private final PlaceSearchMapper placeSearchMapper;
 
-    public PlaceServiceImpl(ClientService clientService, com.pilsa.place.biz.service.keywordService keywordService, PlaceSearchMapper placeSearchMapper) {
+    public PlaceServiceImpl(ClientService clientService
+            , keywordService keywordService
+            , PlaceSearchMapper placeSearchMapper) {
         this.clientService = clientService;
         this.keywordService = keywordService;
         this.placeSearchMapper = placeSearchMapper;
     }
-
 
     @Override
     public Mono<KakaoResponse> searchPlaceMono(PlaceRequest request) {
@@ -56,7 +53,7 @@ public class PlaceServiceImpl implements PlaceService {
     @Override
     public PlaceResponse searchPlaceMerge(PlaceRequest request) {
         /*======================================================================================
-         * i) api 조회
+         * 1) 카카오와 네이버의 다른 End-Point를 병렬 호출하는 Clinet 서비스를 호출한다.
         ======================================================================================*/
         MergeResponse apiResponse = clientService.callParallelSearch(request);
 
@@ -65,7 +62,7 @@ public class PlaceServiceImpl implements PlaceService {
         Iterator<NaverResponse.Item> naverIterator = apiResponse.getNaverResponse().getItems().iterator();
 
         /*======================================================================================
-         * i) 교집합
+         * 2) 카카오와 네이버의 응답에서 교집합을 구한다. 기준은 장소명이다.
         ======================================================================================*/
         while (kakaoIterator.hasNext()) {
             KakaoResponse.Document document = kakaoIterator.next();
@@ -91,7 +88,7 @@ public class PlaceServiceImpl implements PlaceService {
         }
 
         /*======================================================================================
-         * i) KakaoResponse 에 남아있는것이 있다면
+         * 3) KakaoResponse 에 남아있는것이 있다면 추가한다.
         ======================================================================================*/
         apiResponse.getKakaoResponse().getDocuments().forEach(document ->
                 mergePlaces.add(PlaceResponse.Place.builder()
@@ -102,7 +99,7 @@ public class PlaceServiceImpl implements PlaceService {
                         .build()));
 
         /*======================================================================================
-         * i) NaverResponse 에 남아있는것이 있다면
+         * 4) NaverResponse 에 남아있는것이 있다면 추가한다.
         ======================================================================================*/
         apiResponse.getNaverResponse().getItems().forEach(item ->
                 mergePlaces.add(PlaceResponse.Place.builder()
@@ -114,16 +111,45 @@ public class PlaceServiceImpl implements PlaceService {
 
 
         /*======================================================================================
-         * i) 비동기 &
+         * 5) 장소검색 이력을 등록한다.
+         * Propagation REQUIRES_NEW 선언된 서비스를 비동기로 호출한다.
+         * 통합된 검색 결과에 목록이 없으면 유효하지 않은 검색어로 판단하여 호출하지 않는다.
         ======================================================================================*/
-        log.debug("@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Async Start "+ MDC.get(ApiConstant.TRANSACTION_ID));
+        if (log.isDebugEnabled()){
+            log.debug("Async & RequiresNew Test TRANSACTION_ID : {}",MDC.get(ApiConstant.TRANSACTION_ID));
+        }
         if (mergePlaces.size() > 0 ) keywordService.saveSearchHistoryAsync(request);
 
+        /*======================================================================================
+         * 6) 통합된 검색 결과를 반환한다.
+        ======================================================================================*/
         return PlaceResponse.builder()
                 .meta(PlaceResponse.Meta.builder().totalCount(mergePlaces.size()).build())
                 .places(mergePlaces)
                 .build();
     }
+
+    @Override
+    @Cacheable(cacheNames = "popularKeywordCache", key="'fewHour'")
+    public KeywordResponse getPopularKeywordsFromCache() {
+        /*======================================================================================
+         * 1) 인기 키워드 목록 조회한다.
+        ======================================================================================*/
+        List<KeywordResponse.Keyword> keywordList =
+                placeSearchMapper.selectPopularKeywords(PlaceCondition.builder().fewHour(-24).build()).stream()
+                        .map(transactionDTO -> KeywordResponse.Keyword.builder()
+                                .query(transactionDTO.getQuery())
+                                .rank(transactionDTO.getRank())
+                                .queryCnt(transactionDTO.getQueryCnt())
+                                .build())
+                        .collect(Collectors.toList());
+
+        return KeywordResponse.builder()
+                .meta(KeywordResponse.Meta.builder().totalCount(keywordList.size()).build())
+                .keywords(keywordList)
+                .build();
+    }
+
 
     @Override
     public PlaceResponse searchPlaceMergeSimpleData(PlaceRequest request) {
@@ -158,26 +184,5 @@ public class PlaceServiceImpl implements PlaceService {
     }
 
 
-
-    @Override
-    @Cacheable(cacheNames = "popularKeywordCache", key="'fewHour'")
-    public KeywordResponse getPopularKeywordsFromCache() {
-        /*======================================================================================
-         * 1) 인기 키워드 목록 조회
-        ======================================================================================*/
-        List<KeywordResponse.Keyword> keywordList =
-                placeSearchMapper.selectPopularKeywords(PlaceCondition.builder().fewHour(-24).build()).stream()
-                        .map(transactionDTO -> KeywordResponse.Keyword.builder()
-                                .query(transactionDTO.getQuery())
-                                .rank(transactionDTO.getRank())
-                                .queryCnt(transactionDTO.getQueryCnt())
-                                .build())
-                        .collect(Collectors.toList());
-
-        return KeywordResponse.builder()
-                .meta(KeywordResponse.Meta.builder().totalCount(keywordList.size()).build())
-                .keywords(keywordList)
-                .build();
-    }
 
 }

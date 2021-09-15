@@ -16,6 +16,11 @@ import javax.validation.Valid;
  */
 public interface keywordService {
 
+    /**
+     * Save search history async.
+     *
+     * @param request the request
+     */
     @Async
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     void saveSearchHistoryAsync(@Valid PlaceRequest request);

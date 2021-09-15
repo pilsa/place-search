@@ -18,16 +18,42 @@ import javax.validation.Valid;
  */
 public interface PlaceService {
 
-    @Transactional
-    Mono<KakaoResponse> searchPlaceMono(@Valid PlaceRequest request);
-
+    /**
+     * 카카오와 네이버의 다른 End-Point를 병렬 호출하는 Clinet 서비스.
+     * 요구사항에 부합하는 통합된 결과를 반환한다.
+     * Search place merge place response.
+     *
+     * @param request the request
+     * @return the place response
+     */
     @Transactional
     PlaceResponse searchPlaceMerge(@Valid PlaceRequest request);
 
+    /**
+     * Search place mono mono.
+     *
+     * @param request the request
+     * @return the mono
+     */
+    @Transactional
+    Mono<KakaoResponse> searchPlaceMono(@Valid PlaceRequest request);
+
+
+
+    /**
+     * Search place merge simple data place response.
+     *
+     * @param request the request
+     * @return the place response
+     */
     @Transactional
     PlaceResponse searchPlaceMergeSimpleData(@Valid PlaceRequest request);
 
-    @Transactional
+    /**
+     * Gets popular keywords from cache.
+     *
+     * @return the popular keywords from cache
+     */
     KeywordResponse getPopularKeywordsFromCache();
 
 

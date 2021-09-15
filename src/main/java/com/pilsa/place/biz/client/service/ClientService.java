@@ -22,55 +22,40 @@ import reactor.core.scheduler.Schedulers;
 import java.util.stream.Collectors;
 
 /**
+ * The type Client service.
  *
  * @author pilsa_home1
- * @since 2021-09-11 오후 3:06
+ * @since 2021 -09-11 오후 3:06
  */
 @Slf4j
 @Service
 public class ClientService {
-
-    @Autowired
-    private Environment environment;
 
     @Value("${spring.profiles.active}")
     private String profileActive;
 
     private CommonClient httpClient;
 
+    /**
+     * Sets account list client service.
+     *
+     * @param httpClient the http client
+     */
     @Autowired
     @Qualifier("httpClient")
     public void setAccountListClientService(CommonClient httpClient) {
         this.httpClient = httpClient;
     }
 
-    public Mono<KakaoResponse> callKaKaoSearch(PlaceRequest request){
-        return httpClient.requestDataByGetMono(
-                KakaoRequest.builder()
-                        .apiCode(ApiCode.Code.KAKAO_SE01)
-                        .baseUrl(environment.getProperty("endpoints.kakao.base-url"))
-                        .uri("local/search/keyword.json")
-                        .version(VersionInfoCode.V2)
-                        .query(request.getQuery())
-                        .size(5)
-                        .build()
-                , KakaoResponse.class);
-    }
-
-    public Mono<NaverResponse> callNaverSearch(PlaceRequest request){
-         return httpClient.requestDataByGetMono(
-                 NaverRequest.builder()
-                         .baseUrl(environment.getProperty("endpoints.naver.base-url"))
-                         .uri("search/local.json")
-                         .version(VersionInfoCode.V1)
-                         .query(request.getQuery())
-                         .display(5)
-                         .build()
-                 , NaverResponse.class);
-    }
-
-
+    /**
+     * kakaoMono 와 naverMono 를 병렬로 요청하여 응답을 통합하여 반환한다.
+     * Call parallel search merge response.
+     *
+     * @param request the request
+     * @return the merge response
+     */
     public MergeResponse callParallelSearch(PlaceRequest request){
+
         Mono<KakaoResponse> kakaoMono = callKaKaoSearch(request).subscribeOn(Schedulers.elastic());
         Mono<NaverResponse> naverMono = callNaverSearch(request).subscribeOn(Schedulers.elastic());
 
@@ -79,10 +64,58 @@ public class ClientService {
                     .kakaoResponse(kakao)
                     .naverResponse(naver)
                     .build();
-            }).block();
+        }).block();
         return response;
     }
 
+    /**
+     * 카카오 키워드로 장소 검색 API를 호출한다.
+     * 구현체는 {@link com.pilsa.place.framework.webclient.HttpClient}
+     *
+     * @param request the request
+     * @return the mono
+     */
+    public Mono<KakaoResponse> callKaKaoSearch(PlaceRequest request){
+        return httpClient.requestDataByGetMono(
+                KakaoRequest.builder()
+                        .apiCode(ApiCode.Code.KAKAO_SE01)
+                        //.baseUrl(environment.getProperty("endpoints.kakao.base-url"))
+                        //.uri("local/search/keyword.json")
+                        //.version(VersionInfoCode.V2)
+                        .query(request.getQuery())
+                        .size(5)
+                        .build()
+                , KakaoResponse.class);
+    }
+
+    /**
+     * 네이버 지역 검색 API를 호출한다.
+     * Call naver search mono.
+     *
+     * @param request the request
+     * @return the mono
+     */
+    public Mono<NaverResponse> callNaverSearch(PlaceRequest request){
+         return httpClient.requestDataByGetMono(
+                 NaverRequest.builder()
+                         .apiCode(ApiCode.Code.NAVER_SE01)
+                         //.baseUrl(environment.getProperty("endpoints.naver.base-url"))
+                         //.uri("search/local.json")
+                         //.version(VersionInfoCode.V1)
+                         .query(request.getQuery())
+                         .display(5)
+                         .build()
+                 , NaverResponse.class);
+    }
+
+
+    /**
+     * kakaoMono 와 naverMono 를 병렬로 요청하여 응답을 경량 통합하여 반환한다.
+     * Call parallel search simple data merge simple response.
+     *
+     * @param request the request
+     * @return the merge simple response
+     */
     public MergeSimpleResponse callParallelSearchSimpleData(PlaceRequest request){
         Mono<KakaoResponse> kakaoMono = callKaKaoSearch(request).subscribeOn(Schedulers.elastic());
         Mono<NaverResponse> naverMono = callNaverSearch(request).subscribeOn(Schedulers.elastic());
