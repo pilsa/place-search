@@ -45,7 +45,8 @@
 > Local-WAS 부트 업 이후에 아래 2가지 방법으로 테스트가 가능합니다.  
 > 테스트를 위하여 Swagger 설정을 하였습니다. 한번 봐주세요.:heart_eyes:
 * Swagger 테스트
-  * [장소검색 API 서비스 swagger](http://localhost:8087/swagger-ui/#/place)
+  * [장소검색 API 서비스 swagger](http://localhost:8087/swagger-ui/#/place) 
+  * http://localhost:8087/swagger-ui/#/place
 * HTTP Request file 테스트
   * [placeSearch-api-test.http](placeSearch-api-test.http)
 
