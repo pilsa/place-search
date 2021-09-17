@@ -22,7 +22,6 @@ import org.springframework.validation.annotation.Validated;
 public class KeywordServiceImpl implements keywordService {
 
     private final PlaceSearchMapper placeSearchMapper;
-
     public KeywordServiceImpl(PlaceSearchMapper placeSearchMapper) {
         this.placeSearchMapper = placeSearchMapper;
     }

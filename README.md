@@ -55,7 +55,7 @@
 * 대용량 트래픽
   * 카카오와 네이버의 다른 End-Point를 WebClient Mono Zip을 이용하여 병렬 호출한 후 응답을 통합하여 반환합니다.
   * 검색한 이력을 비동기, 신규 트렉젝션으로 저장하여 빠르고 안전하게 API를 응답합니다. (부모의 transactionId는 유지)
-  * 장소검색이력 테이블에 시간정보 컬럼에 Index 생성과 int tpye 설계로 빠른 조회가 가능합니다.
+  * 장소검색이력 테이블의 거래일시 컬럼에 Index 생성과 int tpye 설계로 빠른 조회가 가능합니다.
   * 인기 키워드 API 조회 시 5초(timeToLive) 동안 유효한 Cache에 저장되어 DB부하를 줄입니다.
   
 * 서비스 확장성, 장애 대응
@@ -100,8 +100,8 @@ curl --location --request GET 'http://localhost:8087/v1/place?query=휘경 어�
             "addressName": "서울 동대문구 휘경동 183-381",
             "roadAddressName": "서울 동대문구 이문로8길 8-7",
             "placeUrl": "http://place.map.kakao.com/27368002"
-        }
-      ...중략...
+        },
+      (...중략...)
     ]
 }
 ```
@@ -137,8 +137,8 @@ curl --location --request GET 'http://localhost:8087/v1/place/keywords'
       "query": "휘경 유치원",
       "rank": 2,
       "queryCnt": 12
-    }
-    ...중략...
+    },
+    (...중략...)
 }
 ```
 
