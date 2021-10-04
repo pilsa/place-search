@@ -14,7 +14,10 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.env.Environment;
+import org.springframework.jdbc.datasource.lookup.JndiDataSourceLookup;
 
+import javax.annotation.Resource;
 import javax.sql.DataSource;
 import java.sql.SQLException;
 
@@ -29,11 +32,13 @@ import java.sql.SQLException;
  */
 @Slf4j
 @Configuration
-@Profile("local")
 @MapperScan(
         basePackages = {"com.pilsa.place.biz.**.mapper","com.pilsa.place.common.**.mapper"},
         sqlSessionFactoryRef = "placeSqlSessionFactory")
 public class H2ServerConfig {
+
+    @Resource
+    private Environment environment;
 
 
     /**
@@ -42,6 +47,7 @@ public class H2ServerConfig {
      * @return the data source
      * @throws SQLException the sql exception
      */
+    @Profile("local")
     @Bean(name = "placeDataSource")
     @ConfigurationProperties("spring.datasource.hikari")
     public DataSource dataSource() throws SQLException {
@@ -52,6 +58,16 @@ public class H2ServerConfig {
         }
         log.info("h2-server url = {}", server.getURL());
         return new HikariDataSource();
+    }
+
+    /**
+     * 서버환경 DataSource 주입 샘플
+     */
+    @Profile("!local")
+    @Bean(name = "placeDataSource")
+    public DataSource serverDataSource(){
+        String jndiName = environment.getProperty("spring.place.datasource.jndi-name");
+        return new JndiDataSourceLookup().getDataSource(jndiName);
     }
 
     /**

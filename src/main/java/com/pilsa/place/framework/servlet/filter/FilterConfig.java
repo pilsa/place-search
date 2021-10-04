@@ -33,6 +33,9 @@ public class FilterConfig implements Filter {
         chain.doFilter(request,response);
     }
 
+    /*======================================================================================
+     * AtomicInteger 클래스는 멀티쓰레드 환경에서 동시성을 보장한다.
+    ======================================================================================*/
     private final AtomicInteger tranSerialNumber = new AtomicInteger();
     private final AtomicInteger today = new AtomicInteger();
     private static final int MAX_SEQUENCE = 99999;

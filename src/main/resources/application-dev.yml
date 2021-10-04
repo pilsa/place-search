@@ -1,0 +1,26 @@
+#===========================================
+# 환경 : [DEV]
+#===========================================
+
+#===========================================
+# logging
+# detailed design : resources/logger/logback-{active}.xml
+#===========================================
+logging:
+  config: classpath:logger/logback-local.xml
+  file:
+    path: ./logs
+
+#===========================================
+# spring
+#===========================================
+spring:
+  place:
+    datasource:
+      jndi-name: java:comp/env/jdbc/PLACE_DBDS
+
+  jackson:
+    serialization:
+      FAIL_ON_EMPTY_BEANS: false
+    #default-property-inclusion: non_default
+
