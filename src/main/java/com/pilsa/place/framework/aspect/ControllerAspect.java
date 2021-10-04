@@ -30,16 +30,6 @@ public class ControllerAspect {
         MDC.put(ApiConstant.TRANSACTION_ID, commonRequest.getTransactionId());
     }
 
-    @AfterReturning("controllerAdvice() && args(commonRequest)")
-    public void afterFn (JoinPoint joinPoint, CommonRequest commonRequest){
-        log.debug("aaa");
-    }
-
-    @After("controllerAdvice() && args(commonRequest)")
-    public void after (JoinPoint joinPoint, CommonRequest commonRequest){
-        log.debug("bbb");
-    }
-
 
     @Before("controllerAdvice() && args(commonRequest)")
     public void maintenance(JoinPoint joinPoint, CommonRequest commonRequest){
@@ -72,4 +62,14 @@ public class ControllerAspect {
         }
         return headerMap;
     }
+
+
+    @AfterReturning("controllerAdvice() && args(commonRequest)")
+    public void afterReturning (JoinPoint joinPoint, CommonRequest commonRequest){
+    }
+
+    @After("controllerAdvice() && args(commonRequest)")
+    public void after (JoinPoint joinPoint, CommonRequest commonRequest){
+    }
+
 }

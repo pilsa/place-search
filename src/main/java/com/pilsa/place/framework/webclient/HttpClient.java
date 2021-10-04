@@ -235,17 +235,17 @@ public class HttpClient implements CommonClient{
         }
     }
 
-    private void logApis(String globalId, RequestBase request, ResponseBase response){
+    private void logApis(String transactionId, RequestBase request, ResponseBase response){
         ObjectMapper objectMapper = new ObjectMapper();
 
         objectMapper.setDefaultPropertyInclusion(JsonInclude.Include.NON_DEFAULT);
         try {
-            MDC.put("globalId", globalId);
+            MDC.put(ApiConstant.TRANSACTION_ID, transactionId);
             MDC.put("request", objectMapper.writeValueAsString(request));
             MDC.put("response", objectMapper.writeValueAsString(response));
 
-            log.info("apiLog");
-
+            log.info("{}-request : {}",request.getApiCode(),objectMapper.writeValueAsString(request));
+            log.info("{}-response : {}",request.getApiCode(),objectMapper.writeValueAsString(response));
             MDC.clear();
 
         } catch (JsonProcessingException ignore) {

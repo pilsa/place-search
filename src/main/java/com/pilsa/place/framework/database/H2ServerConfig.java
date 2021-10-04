@@ -79,7 +79,9 @@ public class H2ServerConfig {
      * @throws Exception the exception
      */
     @Bean(name = "placeSqlSessionFactory")
-    public SqlSessionFactory placeSqlSessionFactoryBean(@Qualifier("placeDataSource") DataSource placeDataSource, ApplicationContext applicationContext) throws Exception {
+    public SqlSessionFactory placeSqlSessionFactoryBean(@Qualifier("placeDataSource") DataSource placeDataSource
+            , ApplicationContext applicationContext) throws Exception {
+
         SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
         sqlSessionFactoryBean.setDataSource(placeDataSource);
         sqlSessionFactoryBean.setConfigLocation(applicationContext.getResource("classpath:mybatis/mybatis-config.xml"));
