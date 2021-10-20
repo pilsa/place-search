@@ -1,6 +1,5 @@
 package com.pilsa.place.biz.controller;
 
-import com.pilsa.place.biz.client.vo.response.KakaoResponse;
 import com.pilsa.place.biz.service.PlaceService;
 import com.pilsa.place.biz.vo.request.PlaceRequest;
 import com.pilsa.place.biz.vo.response.KeywordResponse;
@@ -11,7 +10,6 @@ import io.swagger.v3.oas.annotations.tags.Tags;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Mono;
 
 
 /**

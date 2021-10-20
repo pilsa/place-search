@@ -1,13 +1,17 @@
 package com.pilsa.place.biz.service;
 
 import com.pilsa.place.biz.client.vo.response.KakaoResponse;
+import com.pilsa.place.biz.client.vo.response.KakaoResponseList;
 import com.pilsa.place.biz.vo.request.PlaceRequest;
 import com.pilsa.place.biz.vo.response.KeywordResponse;
 import com.pilsa.place.biz.vo.response.PlaceResponse;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.Disposable;
 import reactor.core.publisher.Mono;
+import reactor.core.publisher.ParallelFlux;
 
 import javax.validation.Valid;
+import java.util.List;
 
 
 /**
@@ -38,8 +42,6 @@ public interface PlaceService {
     @Transactional
     Mono<KakaoResponse> searchPlaceMono(@Valid PlaceRequest request);
 
-
-
     /**
      * Search place merge simple data place response.
      *
@@ -55,6 +57,9 @@ public interface PlaceService {
      * @return the popular keywords from cache
      */
     KeywordResponse getPopularKeywordsFromCache();
+
+
+    ParallelFlux<KakaoResponse> searchPlaceFlux();
 
 
 }

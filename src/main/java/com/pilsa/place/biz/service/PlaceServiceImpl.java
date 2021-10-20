@@ -1,10 +1,7 @@
 package com.pilsa.place.biz.service;
 
 import com.pilsa.place.biz.client.service.ClientService;
-import com.pilsa.place.biz.client.vo.response.KakaoResponse;
-import com.pilsa.place.biz.client.vo.response.MergeResponse;
-import com.pilsa.place.biz.client.vo.response.MergeSimpleResponse;
-import com.pilsa.place.biz.client.vo.response.NaverResponse;
+import com.pilsa.place.biz.client.vo.response.*;
 import com.pilsa.place.biz.service.dto.PlaceCondition;
 import com.pilsa.place.biz.service.mapper.PlaceSearchMapper;
 import com.pilsa.place.biz.vo.request.PlaceRequest;
@@ -16,7 +13,9 @@ import org.slf4j.MDC;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
+import reactor.core.Disposable;
 import reactor.core.publisher.Mono;
+import reactor.core.publisher.ParallelFlux;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -150,7 +149,6 @@ public class PlaceServiceImpl implements PlaceService {
                 .build();
     }
 
-
     @Override
     public PlaceResponse searchPlaceMergeSimpleData(PlaceRequest request) {
         /*======================================================================================
@@ -184,5 +182,10 @@ public class PlaceServiceImpl implements PlaceService {
     }
 
 
+
+    @Override
+    public ParallelFlux<KakaoResponse> searchPlaceFlux() {
+        return clientService.callSearchParallelFlux();
+    }
 
 }

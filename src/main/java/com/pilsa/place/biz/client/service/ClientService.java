@@ -2,23 +2,21 @@ package com.pilsa.place.biz.client.service;
 
 import com.pilsa.place.biz.client.vo.request.KakaoRequest;
 import com.pilsa.place.biz.client.vo.request.NaverRequest;
-import com.pilsa.place.biz.client.vo.response.KakaoResponse;
-import com.pilsa.place.biz.client.vo.response.MergeResponse;
-import com.pilsa.place.biz.client.vo.response.MergeSimpleResponse;
-import com.pilsa.place.biz.client.vo.response.NaverResponse;
+import com.pilsa.place.biz.client.vo.response.*;
 import com.pilsa.place.biz.vo.request.PlaceRequest;
 import com.pilsa.place.common.code.ApiCode;
-import com.pilsa.place.common.code.VersionInfoCode;
 import com.pilsa.place.framework.webclient.CommonClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.publisher.ParallelFlux;
 import reactor.core.scheduler.Schedulers;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -136,5 +134,42 @@ public class ClientService {
                         .build())
                 .block();
         return response;
+    }
+
+
+    public ParallelFlux<KakaoResponse> callSearchParallelFlux(){
+    //public KakaoResponseList callSearchParallelFlux(){
+
+        List<PlaceRequest> placeRequestList = new ArrayList<>(5);
+        placeRequestList.add(PlaceRequest.builder().query("핀크").build());
+        placeRequestList.add(PlaceRequest.builder().query("토스").build());
+        placeRequestList.add(PlaceRequest.builder().query("카카오페이").build());
+        placeRequestList.add(PlaceRequest.builder().query("카카오뱅크").build());
+        placeRequestList.add(PlaceRequest.builder().query("토스뱅크").build());
+        List<KakaoResponse> rtn = new ArrayList<>();
+
+        //List<Flux<KakaoResponse>> listFlux =
+        return
+        Flux.fromIterable(placeRequestList)
+                .parallel(5)
+                .runOn(Schedulers.parallel())
+                .flatMap(this::callKaKaoSearch)
+
+                /*
+                .subscribe( kakaoResponse -> {
+                    kakaoResponse.getDocuments().forEach(document ->log.debug("kakaoResponse :: [{}] {}",document.getPlaceName(),document.getAddressName()));
+                    rtn.add(Mono.just(kakaoResponse).block());
+                }, throwable -> {
+                    log.debug("kakaoResponse throwable :: {}", throwable);
+                }, () -> {
+                    log.debug("aaa :: {}",placeRequestList.size());
+                })
+                 */
+        ;
+
+        //.map(kakaoResponse -> Mono.just(kakaoResponse).block())
+        //.ordered((kakaoResponse, t1) -> kakaoResponse.getDocuments().equals(t1.getDocuments()));
+        //Mono<KakaoResponse> kakaoMono = callKaKaoSearch(request).subscribeOn(Schedulers.elastic());
+
     }
 }
