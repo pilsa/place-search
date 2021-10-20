@@ -67,6 +67,7 @@ public class ClientService {
 
     /**
      * 카카오 키워드로 장소 검색 API를 호출한다.
+     * UserAgent 에게 입력받은 키워드, 내부적으로 관리하는 API-Code, 디폴트 사이즈, 응답 Bean
      * 구현체는 {@link com.pilsa.place.framework.webclient.HttpClient}
      *
      * @param request the request

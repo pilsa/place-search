@@ -7,6 +7,7 @@ import lombok.*;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Naver 키워드로 장소 검색 API Response 입니다.
@@ -28,7 +29,7 @@ public class NaverResponse extends ResponseBase {
     @JsonProperty("category")
     private String category; // 검색 결과 업체, 기관의 분류 정보를 제공한다.
     @JsonProperty("items")
-    private ArrayList<Item> items; // 개별 검색 결과
+    private List<Item> items; // 개별 검색 결과
 
     @AllArgsConstructor
     @NoArgsConstructor
