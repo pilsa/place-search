@@ -2,6 +2,7 @@ package com.pilsa.place.framework.database;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.couchbase.config.AbstractCouchbaseConfiguration;
+import org.springframework.data.couchbase.repository.config.EnableCouchbaseRepositories;
 
 /**
  * <pre>
@@ -13,6 +14,7 @@ import org.springframework.data.couchbase.config.AbstractCouchbaseConfiguration;
  */
 
 @Configuration
+@EnableCouchbaseRepositories(basePackages = {"dd"})
 public class CouchbaseConfig extends AbstractCouchbaseConfiguration {
 
     @Override
@@ -32,6 +34,6 @@ public class CouchbaseConfig extends AbstractCouchbaseConfiguration {
 
     @Override
     public String getBucketName() {
-        return "gamesim-sample";
+        return "beer-sample";
     }
 }
