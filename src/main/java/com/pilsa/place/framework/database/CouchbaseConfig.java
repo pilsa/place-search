@@ -14,7 +14,7 @@ import org.springframework.data.couchbase.repository.config.EnableCouchbaseRepos
  */
 
 @Configuration
-@EnableCouchbaseRepositories(basePackages = {"dd"})
+@EnableCouchbaseRepositories(basePackages = {"com.pilsa.place.couchbase.**.mapper"})
 public class CouchbaseConfig extends AbstractCouchbaseConfiguration {
 
     @Override

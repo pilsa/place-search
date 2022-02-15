@@ -71,3 +71,16 @@ GET http://localhost:8087/v1/place/keywords
         client.assert(response.status === 200, "Response status is not 200");
     });
 %}
+
+#################################################################################
+# ddd
+#################################################################################
+GET http://localhost:8087/couchbase/get?param=21st_amendment_brewery_cafe
+GET http://localhost:8087/couchbase/get?param=21st_amendment_brewery_cafe-21a_ipa
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.log("transactionId : "+response.headers.valueOf("transactionId"))
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}
