@@ -1,8 +1,12 @@
 package com.pilsa.place.framework.database;
 
+import com.couchbase.client.core.env.TimeoutConfig;
+import com.couchbase.client.java.env.ClusterEnvironment;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.couchbase.config.AbstractCouchbaseConfiguration;
 import org.springframework.data.couchbase.repository.config.EnableCouchbaseRepositories;
+
+import java.time.Duration;
 
 /**
  * <pre>
@@ -34,6 +38,16 @@ public class CouchbaseConfig extends AbstractCouchbaseConfiguration {
 
     @Override
     public String getBucketName() {
-        return "beer-sample";
+        return "travel-sample";
+    }
+
+    @Override
+    public ClusterEnvironment couchbaseClusterEnvironment() {
+        ClusterEnvironment env = ClusterEnvironment.builder()
+                .timeoutConfig(TimeoutConfig
+                        .kvTimeout(Duration.ofSeconds(5))
+                        .queryTimeout(Duration.ofSeconds(10)))
+                .build();
+        return env;
     }
 }

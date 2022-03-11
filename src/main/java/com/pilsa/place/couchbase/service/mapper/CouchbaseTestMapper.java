@@ -16,9 +16,9 @@ import java.util.Optional;
  */
 public interface CouchbaseTestMapper extends CrudRepository <CouchbaseTestDTO,String>{
     List<CouchbaseTestDTO> findAllById(String id);
-
     Optional<CouchbaseTestDTO> findById(String id);
-
     List<CouchbaseTestDTO> findAllByCity(String city);
 
+    @Override
+    void deleteAll();
 }

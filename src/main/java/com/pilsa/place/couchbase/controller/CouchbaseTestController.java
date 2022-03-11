@@ -4,10 +4,7 @@ import com.pilsa.place.couchbase.service.dto.CouchbaseTestDTO;
 import com.pilsa.place.couchbase.service.mapper.CouchbaseTestMapper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -36,6 +33,15 @@ public class CouchbaseTestController {
         List<CouchbaseTestDTO> result3 = couchbaseTestMapper.findAllByCity(param);
         log.debug(result3.toString());
 
+    }
+
+    @GetMapping("/del")
+    public int deleteSample(@RequestParam String key){
+        int rtn = 0;
+
+        couchbaseTestMapper.deleteAll();
+
+        return rtn;
     }
 
 }
