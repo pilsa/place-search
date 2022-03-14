@@ -19,6 +19,7 @@
     <logger name="reactor" level="info"/>
     <logger name="io.netty" level="info"/>
     <logger name="com.zaxxer.hikari.pool" level="info"/>
+    <logger name="io.netty.util" level="ERROR"/>
 
     <root level="debug">
         <appender-ref ref="STDOUT"/>

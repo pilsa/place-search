@@ -21,4 +21,11 @@ public interface CouchbaseTestMapper extends CrudRepository <CouchbaseTestDTO,St
 
     @Override
     void deleteAll();
+
+
+    @Override
+    void deleteById(String s);
+
+    @Override
+    void delete(CouchbaseTestDTO entity);
 }
