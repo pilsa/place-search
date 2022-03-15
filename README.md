@@ -1,7 +1,7 @@
 # 장소검색 API 서비스
-> 안녕하세요. 카카오뱅크 코딩테스트를 위한 프로젝트 입니다. :heart_eyes:  
-> 구현 상의 필수 요구사항을 모두 충족하여 개발하였습니다.  
-> 감사합니다.
+> 안녕하세요. `필사`입니다. :heart_eyes:   
+> `개발1팀` 기술 세미나를 위한 프로젝트 입니다.    
+> `장소검색 API 서비스`를 구현하였습니다.
 
 ## Table of Contents 
 - [개발환경](#개발환경)
@@ -16,7 +16,7 @@
 * Language : JDK 1.8.0_291
 * Build : Gradle-7.1.1
 * WAS : Embeded Tomcat
-* DBMS : h2Database 1.4.200 서버모드(TCP)
+* DBMS : h2Database 1.4.200 서버모드(TCP), Couchbase 7.0
 * IDE : Intellij IDEA
 * Test : Swagger 3.0
 
@@ -39,11 +39,14 @@
 * lombok 1.18.18
   * 목적 : 생산성 향상 및 가독성 및 유지보수 향상을 위하여 사용함.
   * 참조 : Request, Response, VO, DTO 등에서 전부 사용함.
+* spring-data-couchbase:4.3.2
+  * 목적 : 비정형 데이터를 생성 및 저장, 7.0에 추가된 scope 활용.
+  
 
 
 ## 테스트 환경  
 > Local-WAS 부트 업 이후에 아래 2가지 방법으로 테스트가 가능합니다.  
-> 테스트를 위하여 Swagger 설정을 하였습니다. 한번 봐주세요.:heart_eyes:
+> 테스트를 위하여 Swagger 설정을 하였습니다. :heart_eyes:
 * Swagger 테스트
   * [장소검색 API 서비스 swagger](http://localhost:8087/swagger-ui/#/place) 
   * http://localhost:8087/swagger-ui/#/place
